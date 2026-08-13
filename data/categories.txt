@@ -1,0 +1,3 @@
+1|Dien thoai|Cac loai dien thoai thong minh
+2|Laptop|May tinh xach tay
+3|Phu kien|Phu kien cong nghe
