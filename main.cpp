@@ -102,8 +102,8 @@ bool manHinhDangNhap(AuthService& auth, User& nguoiDung) {
 
     string loi;
     if (auth.login(username, matKhau, nguoiDung, loi)) {
-        cout << "\n[OK] Đăng nhập thành công! Xin chào, " << nguoiDung.fullname
-             << " (" << roleToString(nguoiDung.role) << ")\n";
+        cout << "\n[OK] Đăng nhập thành công! Xin chào, " << nguoiDung.getFullname()
+             << " (" << roleToString(nguoiDung.getRole()) << ")\n";
         dungLai();
         return true;
     } else {
@@ -117,12 +117,12 @@ void manHinhTaiKhoan(AuthService& auth, User& nguoiDung) {
     bool dangDangNhap = true;
     while (dangDangNhap) {
         inTieuDe("TÀI KHOẢN CỦA BẠN");
-        cout << "Mã số        : " << nguoiDung.id << "\n";
-        cout << "Tên đăng nhập: " << nguoiDung.username << "\n";
-        cout << "Họ tên       : " << nguoiDung.fullname << "\n";
-        cout << "Số điện thoại: " << nguoiDung.phone << "\n";
-        cout << "Địa chỉ      : " << nguoiDung.address << "\n";
-        cout << "Vai trò      : " << roleToString(nguoiDung.role) << "\n";
+        cout << "Mã số        : " << nguoiDung.getId() << "\n";
+        cout << "Tên đăng nhập: " << nguoiDung.getUsername() << "\n";
+        cout << "Họ tên       : " << nguoiDung.getFullname() << "\n";
+        cout << "Số điện thoại: " << nguoiDung.getPhone() << "\n";
+        cout << "Địa chỉ      : " << nguoiDung.getAddress() << "\n";
+        cout << "Vai trò      : " << roleToString(nguoiDung.getRole()) << "\n";
         cout << "------------------------------------------------\n";
         cout << "  1. Đổi mật khẩu\n";
         cout << "  2. Cập nhật thông tin cá nhân\n";
@@ -137,8 +137,8 @@ void manHinhTaiKhoan(AuthService& auth, User& nguoiDung) {
             string matKhauCu = readMaskedPassword("Mật khẩu cũ : ");
             string matKhauMoi = readMaskedPassword("Mật khẩu mới: ");
             string loi;
-            if (auth.changePassword(nguoiDung.id, matKhauCu, matKhauMoi, loi)) {
-                nguoiDung.password = matKhauMoi;
+            if (auth.changePassword(nguoiDung.getId(), matKhauCu, matKhauMoi, loi)) {
+                nguoiDung.setPassword(matKhauMoi);
                 cout << "\n[OK] Đổi mật khẩu thành công!\n";
             } else {
                 cout << "\n[X] " << loi << "\n";
@@ -152,10 +152,10 @@ void manHinhTaiKhoan(AuthService& auth, User& nguoiDung) {
             getline(cin, sdt);
             cout << "Địa chỉ mới (Enter để bỏ qua)        : ";
             getline(cin, diaChi);
-            auth.updateProfile(nguoiDung.id, hoTen, sdt, diaChi);
-            if (!hoTen.empty())  nguoiDung.fullname = hoTen;
-            if (!sdt.empty())    nguoiDung.phone = sdt;
-            if (!diaChi.empty()) nguoiDung.address = diaChi;
+            auth.updateProfile(nguoiDung.getId(), hoTen, sdt, diaChi);
+            if (!hoTen.empty())  nguoiDung.setFullname(hoTen);
+            if (!sdt.empty())    nguoiDung.setPhone(sdt);
+            if (!diaChi.empty()) nguoiDung.setAddress(diaChi);
             cout << "\n[OK] Cập nhật thành công!\n";
             dungLai();
         } else if (chon == 3) {
@@ -174,24 +174,24 @@ void manHinhTaiKhoan(AuthService& auth, User& nguoiDung) {
 void inDanhSachSanPham(const vector<Product>& list, CategoryService& categoryService) {
     for (size_t i = 0; i < list.size(); i++) {
         Product p = list[i];
-        cout << "\n  " << (i + 1) << ". " << p.name << "\n";
-        cout << "     Giá: " << formatVND(p.price) << " VNĐ"
-             << "  |  Danh mục: " << categoryService.getNameById(p.categoryId)
-             << "  |  Tồn kho: " << p.stock << "\n";
+        cout << "\n  " << (i + 1) << ". " << p.getName() << "\n";
+        cout << "     Giá: " << formatVND(p.getPrice()) << " VNĐ"
+             << "  |  Danh mục: " << categoryService.getNameById(p.getCategoryId())
+             << "  |  Tồn kho: " << p.getStock() << "\n";
     }
 }
 
 void manHinhChiTietSanPham(const Product& p, CategoryService& categoryService,
                             ProductService& productService, CartService& cartService, int userId) {
-    inTieuDe("CHI TIẾT SẢN PHẨM #" + to_string(p.id));
+    inTieuDe("CHI TIẾT SẢN PHẨM #" + to_string(p.getId()));
 
-    cout << "Tên sản phẩm : " << p.name << "\n";
-    cout << "Giá          : " << formatVND(p.price) << " VNĐ\n";
-    cout << "Danh mục     : " << categoryService.getNameById(p.categoryId) << "\n";
-    cout << "Tồn kho      : " << p.stock << " sản phẩm\n";
-    cout << "Đã bán       : " << p.soldCount << " sản phẩm\n";
-    cout << "Mô tả        : " << (p.description.empty() ? "(không có)" : p.description) << "\n";
-    cout << "Ngày đăng    : " << p.createdAt << "\n";
+    cout << "Tên sản phẩm : " << p.getName() << "\n";
+    cout << "Giá          : " << formatVND(p.getPrice()) << " VNĐ\n";
+    cout << "Danh mục     : " << categoryService.getNameById(p.getCategoryId()) << "\n";
+    cout << "Tồn kho      : " << p.getStock() << " sản phẩm\n";
+    cout << "Đã bán       : " << p.getSoldCount() << " sản phẩm\n";
+    cout << "Mô tả        : " << (p.getDescription().empty() ? "(không có)" : p.getDescription()) << "\n";
+    cout << "Ngày đăng    : " << p.getCreatedAt() << "\n";
 
     cout << "\nBạn muốn:\n";
     cout << "  1. Thêm vào giỏ hàng\n";
@@ -210,7 +210,7 @@ void manHinhChiTietSanPham(const Product& p, CategoryService& categoryService,
         xoaBoDemNhap();
 
         string loi;
-        if (cartService.addItem(userId, p.id, soLuong, productService, loi)) {
+        if (cartService.addItem(userId, p.getId(), soLuong, productService, loi)) {
             cout << "\n[OK] Đã thêm vào giỏ hàng!\n";
         } else {
             cout << "\n[X] " << loi << "\n";
@@ -358,8 +358,8 @@ void manHinhLocTheoDanhMuc(ProductService& productService, CategoryService& cate
     while (dangDuyet) {
         inTieuDe("DANH MỤC SẢN PHẨM");
         for (size_t i = 0; i < danhSachDanhMuc.size(); i++) {
-            int soLuong = (int)productService.filterByCategory(danhSachDanhMuc[i].id).size();
-            cout << "  " << (i + 1) << ". " << danhSachDanhMuc[i].name
+            int soLuong = (int)productService.filterByCategory(danhSachDanhMuc[i].getId()).size();
+            cout << "  " << (i + 1) << ". " << danhSachDanhMuc[i].getName()
                  << " (" << soLuong << " sản phẩm)\n";
         }
         cout << "  0. Quay lại\n";
@@ -377,9 +377,9 @@ void manHinhLocTheoDanhMuc(ProductService& productService, CategoryService& cate
         }
 
         Category danhMucDaChon = danhSachDanhMuc[chon - 1];
-        vector<Product> ketQua = productService.filterByCategory(danhMucDaChon.id);
+        vector<Product> ketQua = productService.filterByCategory(danhMucDaChon.getId());
 
-        inTieuDe("SẢN PHẨM THUỘC DANH MỤC: " + danhMucDaChon.name);
+        inTieuDe("SẢN PHẨM THUỘC DANH MỤC: " + danhMucDaChon.getName());
         if (ketQua.empty()) {
             cout << "[!] Danh mục này chưa có sản phẩm nào.\n";
             dungLai();
@@ -423,14 +423,14 @@ void manHinhGioHang(int userId, CartService& cartService, ProductService& produc
         long long tongCong = 0;
         for (size_t i = 0; i < gioHang.size(); i++) {
             Product sp;
-            if (!productService.findById(gioHang[i].productId, sp)) continue;
+            if (!productService.findById(gioHang[i].getProductId(), sp)) continue;
 
-            long long thanhTien = sp.price * gioHang[i].quantity;
+            long long thanhTien = sp.getPrice() * gioHang[i].getQuantity();
             tongCong += thanhTien;
 
-            cout << "\n  " << (i + 1) << ". " << sp.name << "\n";
-            cout << "     Đơn giá: " << formatVND(sp.price) << " VNĐ"
-                 << "  x  " << gioHang[i].quantity
+            cout << "\n  " << (i + 1) << ". " << sp.getName() << "\n";
+            cout << "     Đơn giá: " << formatVND(sp.getPrice()) << " VNĐ"
+                 << "  x  " << gioHang[i].getQuantity()
                  << "  =  " << formatVND(thanhTien) << " VNĐ\n";
         }
 
@@ -461,7 +461,7 @@ void manHinhGioHang(int userId, CartService& cartService, ProductService& produc
                 xoaBoDemNhap();
 
                 string loi;
-                if (cartService.updateQuantity(userId, gioHang[stt - 1].productId, soLuongMoi, productService, loi)) {
+                if (cartService.updateQuantity(userId, gioHang[stt - 1].getProductId(), soLuongMoi, productService, loi)) {
                     cout << "\n[OK] Đã cập nhật giỏ hàng!\n";
                 } else {
                     cout << "\n[X] " << loi << "\n";
@@ -477,7 +477,7 @@ void manHinhGioHang(int userId, CartService& cartService, ProductService& produc
             xoaBoDemNhap();
 
             if (stt >= 1 && stt <= (int)gioHang.size()) {
-                cartService.removeItem(userId, gioHang[stt - 1].productId);
+                cartService.removeItem(userId, gioHang[stt - 1].getProductId());
                 cout << "\n[OK] Đã xóa sản phẩm khỏi giỏ hàng!\n";
             } else {
                 cout << "\n[X] Số thứ tự không hợp lệ!\n";
@@ -505,7 +505,7 @@ void manHinhTrangChu(AuthService& auth, User& nguoiDung, ProductService& product
                       CategoryService& categoryService, CartService& cartService) {
     bool dangDangNhap = true;
     while (dangDangNhap) {
-        inTieuDe("TRANG CHỦ - Xin chào " + nguoiDung.fullname);
+        inTieuDe("TRANG CHỦ - Xin chào " + nguoiDung.getFullname());
         cout << "  1. Xem danh sách sản phẩm\n";
         cout << "  2. Tìm kiếm sản phẩm\n";
         cout << "  3. Lọc theo danh mục\n";
@@ -519,13 +519,13 @@ void manHinhTrangChu(AuthService& auth, User& nguoiDung, ProductService& product
         xoaBoDemNhap();
 
         if (chon == 1) {
-            manHinhDanhSachSanPham(productService, categoryService, cartService, nguoiDung.id);
+            manHinhDanhSachSanPham(productService, categoryService, cartService, nguoiDung.getId());
         } else if (chon == 2) {
-            manHinhTimKiemSanPham(productService, categoryService, cartService, nguoiDung.id);
+            manHinhTimKiemSanPham(productService, categoryService, cartService, nguoiDung.getId());
         } else if (chon == 3) {
-            manHinhLocTheoDanhMuc(productService, categoryService, cartService, nguoiDung.id);
+            manHinhLocTheoDanhMuc(productService, categoryService, cartService, nguoiDung.getId());
         } else if (chon == 4) {
-            manHinhGioHang(nguoiDung.id, cartService, productService);
+            manHinhGioHang(nguoiDung.getId(), cartService, productService);
         } else if (chon == 5) {
             manHinhTaiKhoan(auth, nguoiDung);
         } else if (chon == 6) {

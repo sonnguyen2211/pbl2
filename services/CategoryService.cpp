@@ -1,19 +1,16 @@
 #include "CategoryService.h"
-#include <fstream>
 
 using namespace std;
 
-CategoryService::CategoryService(const string& dataPath_) : dataPath(dataPath_) {}
+CategoryService::CategoryService(const string& dataPath_) : FileService(dataPath_) {}
 
 vector<Category> CategoryService::loadAll() const {
     vector<Category> list;
-    ifstream fin(dataPath);
-    string line;
+    vector<string> lines = readLines();
 
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
+    for (size_t i = 0; i < lines.size(); i++) {
         Category c;
-        if (Category::deserialize(line, c)) {
+        if (Category::deserialize(lines[i], c)) {
             list.push_back(c);
         }
     }
@@ -21,31 +18,32 @@ vector<Category> CategoryService::loadAll() const {
 }
 
 void CategoryService::saveAll(const vector<Category>& categories) const {
-    ofstream fout(dataPath, ios::trunc);
+    vector<string> lines;
     for (size_t i = 0; i < categories.size(); i++) {
-        fout << categories[i].serialize() << "\n";
+        lines.push_back(categories[i].serialize());
     }
+    writeLines(lines);
 }
 
 int CategoryService::getNextId() const {
     vector<Category> list = loadAll();
     int maxId = 0;
     for (size_t i = 0; i < list.size(); i++) {
-        if (list[i].id > maxId) maxId = list[i].id;
+        if (list[i].getId() > maxId) maxId = list[i].getId();
     }
     return maxId + 1;
 }
 
 string CategoryService::getNameById(int categoryId) const {
     Category c;
-    if (findById(categoryId, c)) return c.name;
+    if (findById(categoryId, c)) return c.getName();
     return "Khong xac dinh";
 }
 
 bool CategoryService::findById(int categoryId, Category& out) const {
     vector<Category> list = loadAll();
     for (size_t i = 0; i < list.size(); i++) {
-        if (list[i].id == categoryId) {
+        if (list[i].getId() == categoryId) {
             out = list[i];
             return true;
         }
@@ -61,7 +59,7 @@ bool CategoryService::addCategory(const string& name, const string& description,
 
     vector<Category> list = loadAll();
     for (size_t i = 0; i < list.size(); i++) {
-        if (list[i].name == name) {
+        if (list[i].getName() == name) {
             errorMsg = "Danh muc '" + name + "' da ton tai!";
             return false;
         }
@@ -71,4 +69,12 @@ bool CategoryService::addCategory(const string& name, const string& description,
     list.push_back(newCat);
     saveAll(list);
     return true;
+}
+
+int CategoryService::count() const {
+    return (int)loadAll().size();
+}
+
+string CategoryService::getServiceName() const {
+    return "CategoryService";
 }

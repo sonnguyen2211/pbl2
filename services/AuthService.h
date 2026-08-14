@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 #include "../models/User.h"
+#include "FileService.h"
 
 using namespace std;
 
-class AuthService {
+// KẾ THỪA (INHERITANCE) FileService để tái sử dụng thao tác đọc/ghi file.
+class AuthService : public FileService {
 private:
-    string dataPath; // Đường dẫn file dữ liệu (ví dụ: "data/users.txt")
-
     // Các hàm hỗ trợ nội bộ
     vector<User> loadAll() const;
     void saveAll(const vector<User>& users) const;
@@ -40,6 +40,10 @@ public:
     // Cập nhật thông tin cá nhân
     bool updateProfile(int userId, const string& fullname,
                         const string& phone, const string& address);
+
+    // --- ĐA HÌNH (POLYMORPHISM): ghi đè phương thức thuần ảo của FileService ---
+    int count() const override;
+    string getServiceName() const override;
 };
 
 // Hàm hỗ trợ nhập mật khẩu ẩn (*) ngoài màn hình Console

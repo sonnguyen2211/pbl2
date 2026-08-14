@@ -5,13 +5,13 @@
 #include <vector>
 #include "../models/Cart.h"
 #include "ProductService.h"
+#include "FileService.h"
 
 using namespace std;
 
-class CartService {
+// KẾ THỪA (INHERITANCE) FileService để tái sử dụng thao tác đọc/ghi file.
+class CartService : public FileService {
 private:
-    string dataPath; // Đường dẫn file dữ liệu (vi du: "data/carts.txt")
-
     // Đọc toàn bộ file -> giỏ hàng của mọi người dùng
     vector<UserCart> loadAllCarts() const;
 
@@ -40,6 +40,10 @@ public:
 
     // Xóa toàn bộ giỏ hàng
     void clearCart(int userId);
+
+    // --- ĐA HÌNH (POLYMORPHISM): ghi đè phương thức thuần ảo của FileService ---
+    int count() const override;
+    string getServiceName() const override;
 };
 
 #endif // CART_SERVICE_H

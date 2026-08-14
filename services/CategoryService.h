@@ -4,13 +4,12 @@
 #include <string>
 #include <vector>
 #include "../models/Category.h"
+#include "FileService.h"
 
 using namespace std;
 
-class CategoryService {
-private:
-    string dataPath; // Đường dẫn file dữ liệu (vi du: "data/categories.txt")
-
+// KẾ THỪA (INHERITANCE) FileService để tái sử dụng thao tác đọc/ghi file.
+class CategoryService : public FileService {
 public:
     explicit CategoryService(const string& dataPath_ = "data/categories.txt");
 
@@ -31,6 +30,10 @@ public:
 
     // Thêm danh mục mới
     bool addCategory(const string& name, const string& description, string& errorMsg);
+
+    // --- ĐA HÌNH (POLYMORPHISM): ghi đè phương thức thuần ảo của FileService ---
+    int count() const override;
+    string getServiceName() const override;
 };
 
 #endif // CATEGORY_SERVICE_H

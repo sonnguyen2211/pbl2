@@ -1,6 +1,5 @@
 #include "AuthService.h"
 #include <ctime>
-#include <fstream>
 #include <iostream>
 
 #ifdef _WIN32
@@ -17,7 +16,7 @@ using namespace std;
 // Tìm người dùng theo ID trong danh sách
 User* findUserById(vector<User>& users, int id) {
     for (size_t i = 0; i < users.size(); i++) {
-        if (users[i].id == id) {
+        if (users[i].getId() == id) {
             return &users[i]; // Trả về con trỏ tới người dùng tìm thấy
         }
     }
@@ -27,7 +26,7 @@ User* findUserById(vector<User>& users, int id) {
 // Tìm người dùng theo Username trong danh sách
 const User* findUserByUsername(const vector<User>& users, const string& username) {
     for (size_t i = 0; i < users.size(); i++) {
-        if (users[i].username == username) {
+        if (users[i].getUsername() == username) {
             return &users[i];
         }
     }
@@ -36,18 +35,16 @@ const User* findUserByUsername(const vector<User>& users, const string& username
 
 // --- PHƯƠNG THỨC CỦA CLASS AuthService ---
 
-AuthService::AuthService(const string& dataPath_) : dataPath(dataPath_) {}
+AuthService::AuthService(const string& dataPath_) : FileService(dataPath_) {}
 
 // Đọc toàn bộ danh sách người dùng từ file txt
 vector<User> AuthService::loadAll() const {
     vector<User> users;
-    ifstream fin(dataPath);
-    string line;
+    vector<string> lines = readLines();
 
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
+    for (size_t i = 0; i < lines.size(); i++) {
         User u;
-        if (User::deserialize(line, u)) {
+        if (User::deserialize(lines[i], u)) {
             users.push_back(u);
         }
     }
@@ -56,18 +53,19 @@ vector<User> AuthService::loadAll() const {
 
 // Ghi toàn bộ danh sách người dùng vào file txt
 void AuthService::saveAll(const vector<User>& users) const {
-    ofstream fout(dataPath, ios::trunc);
+    vector<string> lines;
     for (size_t i = 0; i < users.size(); i++) {
-        fout << users[i].serialize() << "\n";
+        lines.push_back(users[i].serialize());
     }
+    writeLines(lines);
 }
 
 // Tìm ID tiếp theo (ID lớn nhất + 1)
 int AuthService::getNextId(const vector<User>& users) const {
     int maxId = 0;
     for (size_t i = 0; i < users.size(); i++) {
-        if (users[i].id > maxId) {
-            maxId = users[i].id;
+        if (users[i].getId() > maxId) {
+            maxId = users[i].getId();
         }
     }
     return maxId + 1;
@@ -121,7 +119,7 @@ bool AuthService::login(const string& username, const string& password,
         return false;
     }
 
-    if (user->password != password) {
+    if (user->getPassword() != password) {
         errorMsg = "Sai mat khau!";
         return false;
     }
@@ -141,7 +139,7 @@ bool AuthService::changePassword(int userId, const string& oldPassword,
         return false;
     }
 
-    if (user->password != oldPassword) {
+    if (user->getPassword() != oldPassword) {
         errorMsg = "Mat khau cu khong dung!";
         return false;
     }
@@ -151,7 +149,7 @@ bool AuthService::changePassword(int userId, const string& oldPassword,
         return false;
     }
 
-    user->password = newPassword;
+    user->setPassword(newPassword);
     saveAll(users);
     return true;
 }
@@ -164,12 +162,20 @@ bool AuthService::updateProfile(int userId, const string& fullname,
 
     if (user == nullptr) return false;
 
-    if (!fullname.empty()) user->fullname = fullname;
-    if (!phone.empty())    user->phone = phone;
-    if (!address.empty())  user->address = address;
+    if (!fullname.empty()) user->setFullname(fullname);
+    if (!phone.empty())    user->setPhone(phone);
+    if (!address.empty())  user->setAddress(address);
 
     saveAll(users);
     return true;
+}
+
+int AuthService::count() const {
+    return (int)loadAll().size();
+}
+
+string AuthService::getServiceName() const {
+    return "AuthService";
 }
 
 // --- HÀM NHẬP MẬT KHẨU ẨN (*) DỄ HIỂU ---

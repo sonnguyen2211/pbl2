@@ -1,21 +1,18 @@
 #include "ProductService.h"
-#include <fstream>
 #include <cctype>
 #include <ctime>
 
 using namespace std;
 
-ProductService::ProductService(const string& dataPath_) : dataPath(dataPath_) {}
+ProductService::ProductService(const string& dataPath_) : FileService(dataPath_) {}
 
 vector<Product> ProductService::loadAll() const {
     vector<Product> list;
-    ifstream fin(dataPath);
-    string line;
+    vector<string> lines = readLines();
 
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
+    for (size_t i = 0; i < lines.size(); i++) {
         Product p;
-        if (Product::deserialize(line, p)) {
+        if (Product::deserialize(lines[i], p)) {
             list.push_back(p);
         }
     }
@@ -23,17 +20,18 @@ vector<Product> ProductService::loadAll() const {
 }
 
 void ProductService::saveAll(const vector<Product>& products) const {
-    ofstream fout(dataPath, ios::trunc);
+    vector<string> lines;
     for (size_t i = 0; i < products.size(); i++) {
-        fout << products[i].serialize() << "\n";
+        lines.push_back(products[i].serialize());
     }
+    writeLines(lines);
 }
 
 int ProductService::getNextId() const {
     vector<Product> list = loadAll();
     int maxId = 0;
     for (size_t i = 0; i < list.size(); i++) {
-        if (list[i].id > maxId) maxId = list[i].id;
+        if (list[i].getId() > maxId) maxId = list[i].getId();
     }
     return maxId + 1;
 }
@@ -42,13 +40,12 @@ vector<Product> ProductService::getActiveProducts() const {
     vector<Product> all = loadAll();
     vector<Product> result;
     for (size_t i = 0; i < all.size(); i++) {
-        if (all[i].isActive) result.push_back(all[i]);
+        if (all[i].getIsActive()) result.push_back(all[i]);
     }
     return result;
 }
 
 // Đổi chuỗi về chữ thường để so sánh không phân biệt hoa/thường.
-// Dùng vòng for don gian thay vi transform + lambda.
 static string toLower(const string& s) {
     string ketQua = s;
     for (size_t i = 0; i < ketQua.size(); i++) {
@@ -63,8 +60,8 @@ vector<Product> ProductService::searchByKeyword(const string& keyword) const {
     string tuKhoaThuong = toLower(keyword);
 
     for (size_t i = 0; i < active.size(); i++) {
-        string tenThuong = toLower(active[i].name);
-        string moTaThuong = toLower(active[i].description);
+        string tenThuong = toLower(active[i].getName());
+        string moTaThuong = toLower(active[i].getDescription());
 
         bool khopTen  = tenThuong.find(tuKhoaThuong) != string::npos;
         bool khopMoTa = moTaThuong.find(tuKhoaThuong) != string::npos;
@@ -81,7 +78,7 @@ vector<Product> ProductService::filterByCategory(int categoryId) const {
     vector<Product> active = getActiveProducts();
 
     for (size_t i = 0; i < active.size(); i++) {
-        if (active[i].categoryId == categoryId) {
+        if (active[i].getCategoryId() == categoryId) {
             result.push_back(active[i]);
         }
     }
@@ -91,7 +88,7 @@ vector<Product> ProductService::filterByCategory(int categoryId) const {
 bool ProductService::findById(int productId, Product& out) const {
     vector<Product> list = loadAll();
     for (size_t i = 0; i < list.size(); i++) {
-        if (list[i].id == productId) {
+        if (list[i].getId() == productId) {
             out = list[i];
             return true;
         }
@@ -129,13 +126,13 @@ bool ProductService::reduceStock(int productId, int quantity, string& errorMsg) 
     vector<Product> list = loadAll();
 
     for (size_t i = 0; i < list.size(); i++) {
-        if (list[i].id == productId) {
-            if (list[i].stock < quantity) {
-                errorMsg = "San pham '" + list[i].name + "' khong du ton kho!";
+        if (list[i].getId() == productId) {
+            if (list[i].getStock() < quantity) {
+                errorMsg = "San pham '" + list[i].getName() + "' khong du ton kho!";
                 return false;
             }
-            list[i].stock -= quantity;
-            list[i].soldCount += quantity;
+            list[i].setStock(list[i].getStock() - quantity);
+            list[i].setSoldCount(list[i].getSoldCount() + quantity);
             saveAll(list);
             return true;
         }
@@ -143,4 +140,12 @@ bool ProductService::reduceStock(int productId, int quantity, string& errorMsg) 
 
     errorMsg = "Khong tim thay san pham!";
     return false;
+}
+
+int ProductService::count() const {
+    return (int)loadAll().size();
+}
+
+string ProductService::getServiceName() const {
+    return "ProductService";
 }

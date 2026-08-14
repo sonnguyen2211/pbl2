@@ -1,19 +1,16 @@
 #include "CartService.h"
-#include <fstream>
 
 using namespace std;
 
-CartService::CartService(const string& dataPath_) : dataPath(dataPath_) {}
+CartService::CartService(const string& dataPath_) : FileService(dataPath_) {}
 
 vector<UserCart> CartService::loadAllCarts() const {
     vector<UserCart> allCarts;
-    ifstream fin(dataPath);
-    string line;
+    vector<string> lines = readLines();
 
-    while (getline(fin, line)) {
-        if (line.empty()) continue;
+    for (size_t i = 0; i < lines.size(); i++) {
         UserCart cart;
-        if (deserializeCartLine(line, cart)) {
+        if (UserCart::deserialize(lines[i], cart)) {
             allCarts.push_back(cart);
         }
     }
@@ -21,17 +18,18 @@ vector<UserCart> CartService::loadAllCarts() const {
 }
 
 void CartService::saveAllCarts(const vector<UserCart>& allCarts) const {
-    ofstream fout(dataPath, ios::trunc);
+    vector<string> lines;
     for (size_t i = 0; i < allCarts.size(); i++) {
-        fout << serializeCartLine(allCarts[i]) << "\n";
+        lines.push_back(allCarts[i].serialize());
     }
+    writeLines(lines);
 }
 
 vector<CartItem> CartService::getCart(int userId) const {
     vector<UserCart> allCarts = loadAllCarts();
     for (size_t i = 0; i < allCarts.size(); i++) {
-        if (allCarts[i].userId == userId) {
-            return allCarts[i].items;
+        if (allCarts[i].getUserId() == userId) {
+            return allCarts[i].getItems();
         }
     }
     return {}; // chưa có giỏ hàng -> rỗng
@@ -43,8 +41,8 @@ void CartService::saveCart(int userId, const vector<CartItem>& items) const {
     // Tìm dòng của user này để cập nhật
     bool daTimThay = false;
     for (size_t i = 0; i < allCarts.size(); i++) {
-        if (allCarts[i].userId == userId) {
-            allCarts[i].items = items;
+        if (allCarts[i].getUserId() == userId) {
+            allCarts[i].setItems(items);
             daTimThay = true;
             break;
         }
@@ -52,9 +50,7 @@ void CartService::saveCart(int userId, const vector<CartItem>& items) const {
 
     // Chưa có dòng nào -> thêm mới (nếu giỏ hàng không rỗng)
     if (!daTimThay && !items.empty()) {
-        UserCart cartMoi;
-        cartMoi.userId = userId;
-        cartMoi.items = items;
+        UserCart cartMoi(userId, items);
         allCarts.push_back(cartMoi);
     }
 
@@ -80,26 +76,23 @@ bool CartService::addItem(int userId, int productId, int quantity,
     int soLuongDaCo = 0;
     int viTri = -1;
     for (size_t i = 0; i < gioHang.size(); i++) {
-        if (gioHang[i].productId == productId) {
-            soLuongDaCo = gioHang[i].quantity;
+        if (gioHang[i].getProductId() == productId) {
+            soLuongDaCo = gioHang[i].getQuantity();
             viTri = (int)i;
             break;
         }
     }
 
-    if (soLuongDaCo + quantity > sanPham.stock) {
-        errorMsg = "San pham '" + sanPham.name + "' khong du ton kho! (con lai " +
-                   to_string(sanPham.stock) + ")";
+    if (soLuongDaCo + quantity > sanPham.getStock()) {
+        errorMsg = "San pham '" + sanPham.getName() + "' khong du ton kho! (con lai " +
+                   to_string(sanPham.getStock()) + ")";
         return false;
     }
 
     if (viTri >= 0) {
-        gioHang[viTri].quantity += quantity;
+        gioHang[viTri].setQuantity(gioHang[viTri].getQuantity() + quantity);
     } else {
-        CartItem itemMoi;
-        itemMoi.productId = productId;
-        itemMoi.quantity = quantity;
-        gioHang.push_back(itemMoi);
+        gioHang.push_back(CartItem(productId, quantity));
     }
 
     saveCart(userId, gioHang);
@@ -111,7 +104,7 @@ bool CartService::updateQuantity(int userId, int productId, int newQuantity,
     vector<CartItem> gioHang = getCart(userId);
 
     for (size_t i = 0; i < gioHang.size(); i++) {
-        if (gioHang[i].productId == productId) {
+        if (gioHang[i].getProductId() == productId) {
             if (newQuantity <= 0) {
                 gioHang.erase(gioHang.begin() + i);
                 saveCart(userId, gioHang);
@@ -119,13 +112,13 @@ bool CartService::updateQuantity(int userId, int productId, int newQuantity,
             }
 
             Product sanPham;
-            if (productService.findById(productId, sanPham) && newQuantity > sanPham.stock) {
-                errorMsg = "San pham '" + sanPham.name + "' khong du ton kho! (con lai " +
-                           to_string(sanPham.stock) + ")";
+            if (productService.findById(productId, sanPham) && newQuantity > sanPham.getStock()) {
+                errorMsg = "San pham '" + sanPham.getName() + "' khong du ton kho! (con lai " +
+                           to_string(sanPham.getStock()) + ")";
                 return false;
             }
 
-            gioHang[i].quantity = newQuantity;
+            gioHang[i].setQuantity(newQuantity);
             saveCart(userId, gioHang);
             return true;
         }
@@ -139,7 +132,7 @@ void CartService::removeItem(int userId, int productId) {
     vector<CartItem> gioHang = getCart(userId);
 
     for (size_t i = 0; i < gioHang.size(); i++) {
-        if (gioHang[i].productId == productId) {
+        if (gioHang[i].getProductId() == productId) {
             gioHang.erase(gioHang.begin() + i);
             break;
         }
@@ -149,4 +142,12 @@ void CartService::removeItem(int userId, int productId) {
 
 void CartService::clearCart(int userId) {
     saveCart(userId, {});
+}
+
+int CartService::count() const {
+    return (int)loadAllCarts().size();
+}
+
+string CartService::getServiceName() const {
+    return "CartService";
 }

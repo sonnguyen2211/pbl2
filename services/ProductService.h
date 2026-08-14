@@ -4,13 +4,12 @@
 #include <string>
 #include <vector>
 #include "../models/Product.h"
+#include "FileService.h"
 
 using namespace std;
 
-class ProductService {
-private:
-    string dataPath; // Đường dẫn file dữ liệu (vi du: "data/products.txt")
-
+// KẾ THỪA (INHERITANCE) FileService để tái sử dụng thao tác đọc/ghi file.
+class ProductService : public FileService {
 public:
     explicit ProductService(const string& dataPath_ = "data/products.txt");
 
@@ -41,6 +40,10 @@ public:
 
     // Giảm tồn kho + tăng số lượng đã bán sau khi bán được
     bool reduceStock(int productId, int quantity, string& errorMsg);
+
+    // --- ĐA HÌNH (POLYMORPHISM): ghi đè phương thức thuần ảo của FileService ---
+    int count() const override;
+    string getServiceName() const override;
 };
 
 #endif // PRODUCT_SERVICE_H
