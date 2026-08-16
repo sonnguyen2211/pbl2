@@ -1,0 +1,17 @@
+1|Phở bò tái|Món chính|45000|30|1
+2|Cơm tấm sườn bì chả|Món chính|40000|25|1
+3|Bún chả Hà Nội|Món chính|42000|20|1
+4|Mì Quảng|Món chính|38000|0|0
+5|Gỏi cuốn tôm thịt|Khai vị|30000|18|1
+6|Chả giò rế|Khai vị|35000|22|1
+7|Súp cua|Khai vị|28000|12|1
+8|Salad rau trộn dầu giấm|Khai vị|25000|0|0
+9|Trà sữa trân châu|Đồ uống|25000|40|1
+10|Cà phê sữa đá|Đồ uống|20000|50|1
+11|Nước cam ép|Đồ uống|22000|30|1
+12|Sinh tố bơ|Đồ uống|28000|12|1
+13|Chè khúc bạch|Tráng miệng|20000|16|1
+14|Bánh flan|Tráng miệng|15000|20|1
+15|Kem dừa|Tráng miệng|18000|0|0
+16|coca|đồ uống|12000|4|1
+17|Cơm gà|món chính|25000|10|1
