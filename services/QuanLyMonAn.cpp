@@ -78,18 +78,93 @@ void QuanLyMonAn::inMotMon(const MonAn &mon) const
 
 void QuanLyMonAn::xemDanhSach() const
 {
+    xoaManHinh();
+    
     if (danhSach.empty())
     {
         cout << "\nDanh sách món ăn đang trống.\n";
+        dungManHinh();
         return;
     }
-    inTieuDe();
-    for (size_t i = 0; i < danhSach.size(); i++)
+    
+    cout << "\n========== DANH SÁCH MÓN ĂN ==========\n";
+    cout << "Tổng số: " << danhSach.size() << " món\n";
+    cout << "======================================\n\n";
+    
+    // Phân trang đơn giản
+    const int SO_MON_TREN_TRANG = 10;
+    int tongTrang = (danhSach.size() + SO_MON_TREN_TRANG - 1) / SO_MON_TREN_TRANG;
+    int trangHienTai = 1;
+    
+    while (true)
     {
-        inMotMon(danhSach[i]);
+        xoaManHinh();
+        
+        cout << "\n========== DANH SÁCH MÓN ĂN ==========\n";
+        cout << "Trang " << trangHienTai << "/" << tongTrang << "\n";
+        cout << "======================================\n\n";
+        
+        int start = (trangHienTai - 1) * SO_MON_TREN_TRANG;
+        int end = min(start + SO_MON_TREN_TRANG, (int)danhSach.size());
+        
+        cout << "  Mã  | Tên món                 | Loại        | Giá    | Tồn   | Trạng thái\n";
+        cout << "------+--------------------------+-------------+--------+-------+-----------\n";
+        
+        for (int i = start; i < end; i++)
+        {
+            const MonAn& mon = danhSach[i];
+            string trangThai;
+            if (mon.laySoLuongTon() <= 0)
+                trangThai = "HẾT";
+            else if (mon.laySoLuongTon() < 10)
+                trangThai = "SẮP HẾT";
+            else
+                trangThai = "CÒN";
+            
+            printf("  %3d | %-24s | %-11s | %6.0f | %5d | %s\n",
+                   mon.layMaMon(),
+                   mon.layTenMon().c_str(),
+                   mon.layLoaiMon().c_str(),
+                   mon.layGia(),
+                   mon.laySoLuongTon(),
+                   trangThai.c_str());
+        }
+        
+        cout << "------+--------------------------+-------------+--------+-------+-----------\n";
+        cout << "Hiển thị " << (end - start) << "/" << danhSach.size() << " món\n";
+        
+        if (tongTrang > 1)
+        {
+            cout << "\n[N] Trang sau  [P] Trang trước  [Q] Thoát\n";
+            cout << "Lựa chọn: ";
+            char luaChonTrang;
+            cin >> luaChonTrang;
+            
+            if (luaChonTrang == 'n' || luaChonTrang == 'N')
+            {
+                if (trangHienTai < tongTrang)
+                    trangHienTai++;
+                else
+                    cout << "\nĐã ở trang cuối!\n";
+            }
+            else if (luaChonTrang == 'p' || luaChonTrang == 'P')
+            {
+                if (trangHienTai > 1)
+                    trangHienTai--;
+                else
+                    cout << "\nĐã ở trang đầu!\n";
+            }
+            else if (luaChonTrang == 'q' || luaChonTrang == 'Q')
+            {
+                break;
+            }
+        }
+        else
+        {
+            dungManHinh();
+            break;
+        }
     }
-    cout << "---------------------------------------------------------------\n";
-    cout << "Tổng số món: " << danhSach.size() << endl;
 }
 
 void QuanLyMonAn::themMon()
@@ -267,105 +342,247 @@ void QuanLyMonAn::xoaMon()
     }
 }
 
-void QuanLyMonAn::timKiemMon() const
+void QuanLyMonAn::timKiemTheoTen() const
 {
+    // 1. XÓA MÀN HÌNH CŨ
+    xoaManHinh();
+    
+    // 2. KIỂM TRA DANH SÁCH RỖNG
     if (danhSach.empty())
     {
-        cout << "\nDanh sách món ăn đang trống.\n";
+        cout << "\n  ⚠️ Danh sách món ăn đang trống.\n";
+        dungManHinh();
         return;
     }
 
-    int luaChon;
-    cout << "\n== TÌM KIẾM MÓN ĂN ==\n";
-    cout << "1. Tìm theo mã món\n";
-    cout << "2. Tìm theo tên món\n";
-    cout << "3. Tìm theo loại món\n";
-    cout << "Lựa chọn: ";
-    cin >> luaChon;
-
-    bool timThay = false;
-    inTieuDe();
-
-    if (luaChon == 1)
+    // 3. NHẬP TỪ KHÓA TÌM KIẾM
+    string tuKhoa;
+    cin.ignore(); // Xóa bộ đệm
+    cout << "\n========== TÌM KIẾM THEO TÊN MÓN ==========\n";
+    cout << "Nhập tên món cần tìm (có thể nhập 1 phần): ";
+    getline(cin, tuKhoa);
+    
+    // 4. KIỂM TRA TỪ KHÓA RỖNG
+    if (tuKhoa.empty())
     {
-        int ma;
-        cout << "Nhập mã món: ";
-        cin >> ma;
-        int viTri = timViTriTheoMa(ma);
-        if (viTri != -1)
-        {
-            inMotMon(danhSach[viTri]);
-            timThay = true;
-        }
-    }
-    else if (luaChon == 2)
-    {
-        string tuKhoa;
-        cin.ignore();
-        cout << "Nhập tên món (hoặc một phần tên): ";
-        getline(cin, tuKhoa);
-        for (size_t i = 0; i < danhSach.size(); i++)
-        {
-            if (danhSach[i].layTenMon().find(tuKhoa) != string::npos)
-            {
-                inMotMon(danhSach[i]);
-                timThay = true;
-            }
-        }
-    }
-    else if (luaChon == 3)
-    {
-        string loai;
-        cin.ignore();
-        cout << "Nhập loại món: ";
-        getline(cin, loai);
-        for (size_t i = 0; i < danhSach.size(); i++)
-        {
-            if (danhSach[i].layLoaiMon() == loai)
-            {
-                inMotMon(danhSach[i]);
-                timThay = true;
-            }
-        }
-    }
-    else
-    {
-        cout << "Lựa chọn không hợp lệ!\n";
+        cout << "\n  ⚠️ Bạn chưa nhập từ khóa tìm kiếm!\n";
+        dungManHinh();
         return;
     }
 
-    cout << "---------------------------------------------------------------\n";
-    if (!timThay)
-        cout << "Không tìm thấy món ăn phù hợp.\n";
+    // 5. CHUYỂN TỪ KHÓA SANG CHỮ THƯỜNG (để tìm không phân biệt hoa/thường)
+    string tuKhoaThuong = tuKhoa;
+    for (char &c : tuKhoaThuong)
+        c = tolower(c);
+    
+    // 6. TÌM KIẾM VÀ LƯU KẾT QUẢ
+    vector<int> viTriTimThay; // Lưu vị trí các món tìm thấy
+    
+    for (size_t i = 0; i < danhSach.size(); i++)
+    {
+        // Lấy tên món hiện tại
+        string tenMon = danhSach[i].layTenMon();
+        
+        // Chuyển tên món sang chữ thường
+        string tenMonThuong = tenMon;
+        for (char &c : tenMonThuong)
+            c = tolower(c);
+        
+        // Kiểm tra từ khóa có nằm trong tên món không
+        // find() trả về vị trí đầu tiên tìm thấy, nếu không tìm thấy trả về string::npos
+        if (tenMonThuong.find(tuKhoaThuong) != string::npos)
+        {
+            viTriTimThay.push_back(i); // Lưu vị trí
+        }
+    }
+
+    // 7. XÓA MÀN HÌNH TRƯỚC KHI HIỂN THỊ KẾT QUẢ
+    xoaManHinh();
+    
+    // 8. HIỂN THỊ KẾT QUẢ
+    cout << "\n========== KẾT QUẢ TÌM KIẾM ==========\n";
+    cout << "Từ khóa: \"" << tuKhoa << "\"\n";
+    cout << "Số lượng tìm thấy: " << viTriTimThay.size() << " món\n";
+    cout << "======================================\n\n";
+    
+    // 9. XỬ LÝ TRƯỜNG HỢP KHÔNG TÌM THẤY
+    if (viTriTimThay.empty())
+    {
+        cout << "  ❌ Không tìm thấy món ăn nào chứa \"" << tuKhoa << "\"\n";
+        cout << "\n  💡 Gợi ý:\n";
+        cout << "     - Kiểm tra chính tả từ khóa\n";
+        cout << "     - Thử nhập 1 phần của tên (ví dụ: 'pho' thay vì 'Phở bò')\n";
+        cout << "     - Danh sách hiện có " << danhSach.size() << " món\n";
+        dungManHinh();
+        return;
+    }
+
+    // 10. HIỂN THỊ DANH SÁCH KẾT QUẢ (PHÂN TRANG)
+    const int SO_MON_TREN_TRANG = 8;
+    int tongTrang = (viTriTimThay.size() + SO_MON_TREN_TRANG - 1) / SO_MON_TREN_TRANG;
+    int trangHienTai = 1;
+    
+    while (true)
+    {
+        // Xóa màn hình khi chuyển trang
+        xoaManHinh();
+        
+        cout << "\n========== KẾT QUẢ TÌM KIẾM ==========\n";
+        cout << "Từ khóa: \"" << tuKhoa << "\"\n";
+        cout << "Trang " << trangHienTai << "/" << tongTrang << "\n";
+        cout << "======================================\n\n";
+        
+        // Tính vị trí bắt đầu và kết thúc của trang
+        int start = (trangHienTai - 1) * SO_MON_TREN_TRANG;
+        int end = min(start + SO_MON_TREN_TRANG, (int)viTriTimThay.size());
+        
+        // Hiển thị tiêu đề bảng
+        cout << "  STT | Mã   | Tên món                 | Loại        | Giá    | Tồn   | Trạng thái\n";
+        cout << "------+------+--------------------------+-------------+--------+-------+-----------\n";
+        
+        // Hiển thị từng món
+        for (int i = start; i < end; i++)
+        {
+            int viTri = viTriTimThay[i];
+            const MonAn& mon = danhSach[viTri];
+            
+            // Xác định trạng thái
+            string trangThai;
+            if (mon.laySoLuongTon() <= 0)
+                trangThai = "🔴 HẾT";
+            else if (mon.laySoLuongTon() < 10)
+                trangThai = "🟡 SẮP HẾT";
+            else
+                trangThai = "🟢 CÒN";
+            
+            // In thông tin món (dùng printf để căn chỉnh dễ hơn)
+            printf("  %3d | %4d | %-24s | %-11s | %6.0f | %5d | %s\n",
+                   i + 1,                    // STT
+                   mon.layMaMon(),           // Mã
+                   mon.layTenMon().c_str(),  // Tên
+                   mon.layLoaiMon().c_str(), // Loại
+                   mon.layGia(),             // Giá
+                   mon.laySoLuongTon(),      // Tồn
+                   trangThai.c_str());       // Trạng thái
+        }
+        
+        cout << "------+------+--------------------------+-------------+--------+-------+-----------\n";
+        cout << "Hiển thị " << (end - start) << "/" << viTriTimThay.size() << " món\n";
+        cout << "Tổng số món trong danh sách: " << danhSach.size() << "\n";
+        
+        // Xử lý phân trang
+        if (tongTrang > 1)
+        {
+            cout << "\n  [N] Trang sau    [P] Trang trước    [Q] Thoát xem kết quả\n";
+            cout << "  Lựa chọn: ";
+            
+            char luaChonTrang;
+            cin >> luaChonTrang;
+            
+            if (luaChonTrang == 'n' || luaChonTrang == 'N')
+            {
+                if (trangHienTai < tongTrang)
+                    trangHienTai++;
+                else
+                {
+                    cout << "\n  ⚠️ Đã ở trang cuối cùng!\n";
+                    dungManHinh();
+                }
+            }
+            else if (luaChonTrang == 'p' || luaChonTrang == 'P')
+            {
+                if (trangHienTai > 1)
+                    trangHienTai--;
+                else
+                {
+                    cout << "\n  ⚠️ Đã ở trang đầu tiên!\n";
+                    dungManHinh();
+                }
+            }
+            else if (luaChonTrang == 'q' || luaChonTrang == 'Q')
+            {
+                break;
+            }
+            else
+            {
+                cout << "\n  ❌ Lựa chọn không hợp lệ! Chỉ chọn N, P hoặc Q\n";
+                dungManHinh();
+            }
+        }
+        else
+        {
+            // Nếu chỉ có 1 trang, hiển thị và thoát sau khi nhấn ENTER
+            cout << "\n  Nhấn ENTER để quay lại...";
+            cin.ignore();
+            cin.get();
+            break;
+        }
+    }
 }
-
 void QuanLyMonAn::locTheoLoai() const
 {
+    xoaManHinh();
+    
     if (danhSach.empty())
     {
         cout << "\nDanh sách món ăn đang trống.\n";
+        dungManHinh();
         return;
     }
 
     string loai;
     cin.ignore();
-    cout << "\n== LỌC MÓN THEO LOẠI ==\n";
-    cout << "Nhập loại cần lọc (Khai vị / Món chính / Đồ uống / Tráng miệng): ";
+    cout << "\n========== LỌC MÓN THEO LOẠI ==========\n";
+    cout << "Nhập loại cần lọc: ";
     getline(cin, loai);
-
-    bool timThay = false;
-    inTieuDe();
+    
+    // Chuyển sang chữ thường để so sánh
+    string loaiThuong = chuyenThanhChuThuong(loai);
+    
+    vector<int> viTriTimThay;
     for (size_t i = 0; i < danhSach.size(); i++)
     {
-        if (danhSach[i].layLoaiMon() == loai)
-        {
-            inMotMon(danhSach[i]);
-            timThay = true;
-        }
+        string loaiMon = danhSach[i].layLoaiMon();
+        string loaiMonThuong = chuyenThanhChuThuong(loaiMon);
+        
+        if (loaiMonThuong == loaiThuong)
+            viTriTimThay.push_back(i);
     }
-    cout << "---------------------------------------------------------------\n";
-    if (!timThay)
-        cout << "Không có món nào thuộc loại \"" << loai << "\".\n";
+    
+    xoaManHinh();
+    
+    cout << "\n========== KẾT QUẢ LỌC ==========\n";
+    cout << "Loại: \"" << loai << "\"\n";
+    cout << "Số lượng: " << viTriTimThay.size() << " món\n";
+    cout << "===============================\n\n";
+    
+    if (viTriTimThay.empty())
+    {
+        cout << "⚠️ Không có món nào thuộc loại \"" << loai << "\".\n";
+        dungManHinh();
+        return;
+    }
+    
+    // Hiển thị kết quả
+    cout << "  Mã  | Tên món                 | Giá    | Tồn   | Trạng thái\n";
+    cout << "------+--------------------------+--------+-------+-----------\n";
+    
+    for (size_t i = 0; i < viTriTimThay.size(); i++)
+    {
+        const MonAn& mon = danhSach[viTriTimThay[i]];
+        string trangThai = (mon.laySoLuongTon() > 0) ? "CÒN" : "HẾT";
+        
+        printf("  %3d | %-24s | %6.0f | %5d | %s\n",
+               mon.layMaMon(),
+               mon.layTenMon().c_str(),
+               mon.layGia(),
+               mon.laySoLuongTon(),
+               trangThai.c_str());
+    }
+    
+    cout << "------+--------------------------+--------+-------+-----------\n";
+    
+    dungManHinh();
 }
 
 void QuanLyMonAn::sapXepMon()
@@ -654,15 +871,20 @@ void QuanLyMonAn::hienThiMenu()
         case 1: themMon(); break;
         case 2: capNhatMon(); break;
         case 3: xoaMon(); break;
-        case 4: timKiemMon(); break;
+        case 4: timKiemTheoTen(); break;
         case 5: xemDanhSach(); break;
         case 6: locTheoLoai(); break;
         case 7: sapXepMon(); break;
         case 8: quanLyTrangThai(); break;
         case 9: capNhatTonKho(); break;
         case 10: thongKeMon(); break;
-        case 0: cout << "\nQuay lại...\n"; break;
-        default: cout << "\nLựa chọn không hợp lệ, vui lòng chọn lại!\n";
+        case 0: 
+            cout << "\nQuay lại...\n"; 
+            dungManHinh();
+            break;
+        default: 
+            cout << "\nLựa chọn không hợp lệ!\n";
+            dungManHinh();
         }
     } while (luaChon != 0);
 }

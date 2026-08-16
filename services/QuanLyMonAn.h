@@ -11,26 +11,29 @@ class QuanLyMonAn
 {
 private:
     vector<MonAn> danhSach;
-    int maTiepTheo; // dung de sinh ma moi tu dong
+    int maTiepTheo;
 
-    int timViTriTheoMa(int maMon) const; // tra ve -1 neu khong thay
+    int timViTriTheoMa(int maMon) const;
 
 public:
     QuanLyMonAn();
 
-    // Chuc nang chinh
+    // Chức năng chính
     void themMon();
     void capNhatMon();
     void xoaMon();
-    void timKiemMon() const;
+    
+    // Tìm kiếm theo tên (chỉ 1 chức năng duy nhất)
+    void timKiemTheoTen() const;  // <--- THÊM DÒNG NÀY
+    
     void xemDanhSach() const;
     void locTheoLoai() const;
     void sapXepMon();
     void quanLyTrangThai();
-    void capNhatTonKho(); // nhap hang / cap nhat ton kho
+    void capNhatTonKho();
     void thongKeMon() const;
 
-    // Ham phu tro hien thi
+    // Hàm phụ trợ
     void inTieuDe() const;
     void inMotMon(const MonAn &mon) const;
 
