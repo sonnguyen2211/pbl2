@@ -14,8 +14,13 @@ int demSoKyTuUTF8(const string &s);
 
 // Can le trai chuoi UTF-8 cho du doRong ky tu hien thi (them khoang trang phia sau)
 string canLeTraiUTF8(const string &s, int doRong);
-// Thêm vào cuối file
+
 void xoaManHinh();
 void dungManHinh();
-string chuyenThanhChuThuong(const string& s);
+string chuyenThanhChuThuong(const string &s);
+
+// Ve khung hop dang box-drawing (dung chung cho tat ca man hinh/menu)
+void veKhungTieuDe(const string &tieuDe, int doRong = 44);
+void veDuongKe(int doRong = 44);
+
 #endif

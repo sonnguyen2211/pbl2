@@ -15,8 +15,8 @@
         "-I${workspaceFolder}\\utils",
         "${workspaceFolder}\\main.cpp",
         "${workspaceFolder}\\Dashboard.cpp",
-        "${workspaceFolder}\\models\\MonAn.cpp",
         "${workspaceFolder}\\services\\QuanLyMonAn.cpp",
+        "${workspaceFolder}\\services\\QuanLyTaiKhoan.cpp",
         "${workspaceFolder}\\utils\\Utils.cpp",
         "-o",
         "${workspaceFolder}\\main.exe"

@@ -1,17 +1,19 @@
-1|Phở bò tái|Món chính|45000|30|1
-2|Cơm tấm sườn bì chả|Món chính|40000|37|1
-3|Bún chả Hà Nội|Món chính|42000|20|1
-4|Mì Quảng|Món chính|38000|0|0
-5|Gỏi cuốn tôm thịt|Khai vị|30000|18|1
-6|Chả giò rế|Khai vị|35000|22|1
-7|Súp cua|Khai vị|28000|12|1
-8|Salad rau trộn dầu giấm|Khai vị|25000|0|0
-9|Trà sữa trân châu|Đồ uống|25000|40|1
-10|Cà phê sữa đá|Đồ uống|20000|50|1
-11|Nước cam ép|Đồ uống|22000|30|1
-12|Sinh tố bơ|Đồ uống|28000|12|1
-13|Chè khúc bạch|Tráng miệng|20000|16|1
-14|Bánh flan|Tráng miệng|15000|20|1
-15|Kem dừa|Tráng miệng|18000|0|0
-16|coca|đồ uống|12000|4|1
-17|Cơm gà|món chính|25000|10|1
+1|Phở bò tái|Món chính|45000|30|1|Tô|Phở bò tái truyền thống|1|||
+2|Cơm tấm sườn bì chả|Món chính|40000|37|1|Phần|Cơm tấm kiểu Sài Gòn|3|||cơm:1000
+3|Bún chả Hà Nội|Món chính|42000|20|1|Phần|Bún chả nướng than hoa|1|||
+4|Mì Quảng|Món chính|38000|0|2|Tô|Mì Quảng đặc sản miền Trung|1|||
+5|Gỏi cuốn tôm thịt|Khai vị|30000|18|1|Cuốn|Gỏi cuốn tươi|1|||
+6|Chả giò rế|Khai vị|35000|22|1|Phần|Chả giò giòn rụm|1|||
+7|Súp cua|Khai vị|28000|12|1|Chén|Súp cua trứng bắc thảo|1|||
+8|Salad rau trộn dầu giấm|Khai vị|25000|0|2|Phần|Salad rau tươi|1|||
+9|Trà sữa trân châu|Đồ uống|25000|40|1|Ly|Trà sữa trân châu đường đen|1||Lượng đường:0%,50%,100%|
+10|Cà phê sữa đá|Đồ uống|20000|50|1|Ly|Cà phê phin truyền thống|1||Lượng đường:0%,50%,100%|
+11|Nước cam ép|Đồ uống|22000|30|1|Ly|Nước cam tươi ép|1|||
+12|Sinh tố bơ|0|28000|12|1|Ly|Sinh tố bơ sáp|3|||
+13|Chè khúc bạch|Tráng miệng|20000|16|1|Chén|Chè khúc bạch hạnh nhân|1|||
+14|Bánh flan|Tráng miệng|15000|20|1|Cái|Bánh flan caramen|1|||
+15|Kem dừa|Tráng miệng|18000|0|2|Ly|Kem dừa nạo|1|||
+16|Coca Cola|Đồ uống|12000|4|1|Chai|Nước ngọt có gas|1|||
+17|Cơm gà|Món chính|25000|10|1|Phần|Cơm gà xối mỡ|1|||
+18|Mì cay hải sản|Món chính|45000|25|1|Tô|Mì cay hải sản cấp độ 1|2|Mì:100:gram;Tôm:50:gram;Mực:50:gram||
+19|Pizza tự chọn|Pizza|80000|15|1|Cái|Pizza đế mỏng tự chọn topping|3|||Xúc xích:15000;Hải sản:20000;Nấm:10000;Phô mai:15000

@@ -1,12 +1,18 @@
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
 
+#include "QuanLyTaiKhoan.h" // can NguoiDung de truyen xuong cac menu con
+
 class Dashboard
 {
+private:
+    void menuQuanLy(const NguoiDung &nguoiDung);
+    void menuThuNgan(const NguoiDung &nguoiDung);
+
 public:
     Dashboard();
 
-    // Hien thi menu chinh, dieu huong sang tung module chuc nang
+    // Dang nhap, sau do hien thi menu chinh theo vai tro, dieu huong sang tung module
     void chay();
 };
 
