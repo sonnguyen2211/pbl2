@@ -15,5 +15,5 @@
 15|Kem dừa|Tráng miệng|18000|0|2|Ly|Kem dừa nạo|1|||
 16|Coca Cola|Đồ uống|12000|4|1|Chai|Nước ngọt có gas|1|||
 17|Cơm gà|Món chính|25000|10|1|Phần|Cơm gà xối mỡ|1|||
-18|Mì cay hải sản|Món chính|45000|25|1|Tô|Mì cay hải sản cấp độ 1|2|Mì:100:gram;Tôm:50:gram;Mực:50:gram||
+18|Mì cay hải sản|Món chính|45000|25|1|Tô|Mì cay hải sản cấp độ 1|2|Mì:100:gram;Tôm:50:gram;Mực:50:gram;0:1:1||
 19|Pizza tự chọn|Pizza|80000|15|1|Cái|Pizza đế mỏng tự chọn topping|3|||Xúc xích:15000;Hải sản:20000;Nấm:10000;Phô mai:15000
