@@ -1,19 +1,25 @@
-1|Phở bò tái|Món chính|45000|30|1|Tô|Phở bò tái truyền thống|1|||
-2|Cơm tấm sườn bì chả|Món chính|40000|37|1|Phần|Cơm tấm kiểu Sài Gòn|3|||cơm:1000
-3|Bún chả Hà Nội|Món chính|42000|20|1|Phần|Bún chả nướng than hoa|1|||
-4|Mì Quảng|Món chính|38000|0|2|Tô|Mì Quảng đặc sản miền Trung|1|||
-5|Gỏi cuốn tôm thịt|Khai vị|30000|18|1|Cuốn|Gỏi cuốn tươi|1|||
-6|Chả giò rế|Khai vị|35000|22|1|Phần|Chả giò giòn rụm|1|||
-7|Súp cua|Khai vị|28000|12|1|Chén|Súp cua trứng bắc thảo|1|||
-8|Salad rau trộn dầu giấm|Khai vị|25000|0|2|Phần|Salad rau tươi|1|||
-9|Trà sữa trân châu|Đồ uống|25000|40|1|Ly|Trà sữa trân châu đường đen|1||Lượng đường:0%,50%,100%|
-10|Cà phê sữa đá|Đồ uống|20000|50|1|Ly|Cà phê phin truyền thống|1||Lượng đường:0%,50%,100%|
-11|Nước cam ép|Đồ uống|22000|30|1|Ly|Nước cam tươi ép|1|||
-12|Sinh tố bơ|0|28000|12|1|Ly|Sinh tố bơ sáp|3|||
-13|Chè khúc bạch|Tráng miệng|20000|16|1|Chén|Chè khúc bạch hạnh nhân|1|||
-14|Bánh flan|Tráng miệng|15000|20|1|Cái|Bánh flan caramen|1|||
-15|Kem dừa|Tráng miệng|18000|0|2|Ly|Kem dừa nạo|1|||
-16|Coca Cola|Đồ uống|12000|4|1|Chai|Nước ngọt có gas|1|||
-17|Cơm gà|Món chính|25000|10|1|Phần|Cơm gà xối mỡ|1|||
-18|Mì cay hải sản|Món chính|45000|25|1|Tô|Mì cay hải sản cấp độ 1|2|Mì:100:gram;Tôm:50:gram;Mực:50:gram;0:1:1||
-19|Pizza tự chọn|Pizza|80000|15|1|Cái|Pizza đế mỏng tự chọn topping|3|||Xúc xích:15000;Hải sản:20000;Nấm:10000;Phô mai:15000
+P001|Phở bò tái|Món chính|45000|0|1|Phở bò tái truyền thống|1|1|Lượng đường:0%,50%,100%||
+C001|Cơm tấm sườn bì chả|Món chính|40000|0|1|Cơm tấm kiểu Sài Gòn|3|3||cơm:15000;trứng:10000;chả:12000|
+B001|Bún chả Hà Nội|Món chính|42000|0|1|Bún chả nướng than hoa|1|1|||
+M001|Mì Quảng|Món chính|38000|0|1|Mì Quảng đặc sản miền Trung|1|1|||
+K001|Gỏi cuốn tôm thịt|Khai vị|30000|0|1|Gỏi cuốn tươi|1|1|||
+K002|Chả giò rế|Khai vị|35000|0|1|Chả giò giòn rụm|1|1|||
+K003|Súp cua|Khai vị|28000|0|1|Súp cua trứng bắc thảo|1|1|||
+K004|Salad rau trộn dầu giấm|Khai vị|25000|0|1|Salad rau tươi|1|1|||
+D001|Trà sữa trân châu|Đồ uống|25000|0|1|Trà sữa trân châu đường đen|1|1||Lượng đường:0%,50%,100%;Đá:ít,trung bình,nhiều|
+D002|Cà phê sữa đá|Đồ uống|20000|0|1|Cà phê phin truyền thống|1|1|Lượng đường:0%,50%,100%;Sữa:ít,trung bình,nhiều||
+D003|Nước cam ép|Đồ uống|22000|0|1|Nước cam tươi ép|1|1|Đá:ít,trung bình,nhiều||
+D004|Sinh tố bơ|Đồ uống|28000|0|1|Sinh tố bơ sáp|3|1||Sữa đặc:ít,trung bình,nhiều;Đá:ít,trung bình,nhiều|
+T001|Chè khúc bạch|Tráng miệng|20000|0|1|Chè khúc bạch hạnh nhân|1|1|||
+T002|Bánh flan|Tráng miệng|15000|0|1|Bánh flan caramen|1|1|||
+T003|Kem dừa|Tráng miệng|18000|0|1|Kem dừa nạo|1|1|||
+D005|Coca Cola|Đồ uống|12000|0|1|Nước ngọt có gas|1|1|Đá:ít,trung bình,nhiều||
+C002|Cơm gà|Món chính|25000|0|1|Cơm gà xối mỡ|1|1|||
+C003|Mì cay hải sản|Món chính|45000|0|1|Mì cay hải sản cấp độ 1|2|1||Độ cay:không,cay ít,cay nhiều|
+P002|Pizza tự chọn|Món chính|80000|0|1|Pizza đế mỏng tự chọn topping|3|1||Xúc xích:15000;Hải sản:20000;Nấm:10000;Phô mai:15000|
+C004|Bánh mì thịt nướng|Món chính|35000|0|1|Bánh mì thịt nướng thơm ngon|1|1|||
+C005|Hủ tiếu Nam Vang|Món chính|40000|0|1|Hủ tiếu Nam Vang đặc biệt|2|1|||
+C006|Cháo lòng|Món chính|30000|0|1|Cháo lòng heo thơm ngon|1|1|||
+C007|Bánh xèo|Món chính|45000|0|1|Bánh xèo giòn rụm nhân tôm thịt|1|1|||
+D006|Trà đá|Đồ uống|5000|0|1|Trà đá mát lạnh|1|1|Đá:ít,trung bình,nhiều||
+D007|Nước suối|Đồ uống|10000|0|1|Nước suối tinh khiết|1|1|Đá:ít,trung bình,nhiều||
