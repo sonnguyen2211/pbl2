@@ -1,2 +1,0 @@
-admin|admin123|Nguyễn Văn A|1
-thungan|123456|Trần Thị B|2

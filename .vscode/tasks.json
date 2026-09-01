@@ -17,6 +17,7 @@
         "${workspaceFolder}\\Dashboard.cpp",
         "${workspaceFolder}\\services\\QuanLyMonAn.cpp",
         "${workspaceFolder}\\services\\QuanLyTaiKhoan.cpp",
+        "${workspaceFolder}\\services\\QuanLyNhanVien.cpp",
         "${workspaceFolder}\\utils\\Utils.cpp",
         "-o",
         "${workspaceFolder}\\main.exe"

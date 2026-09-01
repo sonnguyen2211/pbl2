@@ -1,0 +1,3 @@
+NV000|admin|admin123|Nguyễn Văn A||1|1|1|0
+NV001|thungan|123456|Trần Thị B||2|1|1|0
+NV002|son|123|Nguyễn Hoàng Sơn|09786565432|1|1|1|0

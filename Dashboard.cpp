@@ -1,5 +1,6 @@
 #include "Dashboard.h"
 #include "QuanLyMonAn.h"
+#include "QuanLyNhanVien.h"
 #include "Utils.h"
 #include <iostream>
 using namespace std;
@@ -19,7 +20,7 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
         cout << "1. Bán hàng                  (đang phát triển)\n";
         cout << "2. Quản lý thực đơn\n";
         cout << "3. Quản lý khách hàng         (đang phát triển)\n";
-        cout << "4. Quản lý nhân viên          (đang phát triển)\n";
+        cout << "4. Quản lý nhân viên\n";
         cout << "5. Quản lý kho                (đang phát triển)\n";
         cout << "6. Quản lý thu - chi          (đang phát triển)\n";
         cout << "7. Thống kê & báo cáo         (đang phát triển)\n";
@@ -45,9 +46,11 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
             dungManHinh();
             break;
         case 4:
-            cout << "\nChức năng quản lý nhân viên đang được phát triển.\n";
-            dungManHinh();
+{
+            QuanLyNhanVien qlNhanVien;
+            qlNhanVien.hienThiMenu();
             break;
+}
         case 5:
             cout << "\nChức năng quản lý kho đang được phát triển.\n";
             dungManHinh();
