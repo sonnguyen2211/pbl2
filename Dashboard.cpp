@@ -11,113 +11,122 @@ Dashboard::Dashboard()
 
 void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
 {
-    int luaChon;
-    do
+    while (true)
     {
-        xoaManHinh();
-        veKhungTieuDe("MENU QUẢN LÝ");
-        cout << "\nXin chào, " << nguoiDung.layHoTen() << " (" << nguoiDung.layTenVaiTro() << ")\n\n";
-        cout << "1. Bán hàng                  (đang phát triển)\n";
-        cout << "2. Quản lý thực đơn\n";
-        cout << "3. Quản lý khách hàng         (đang phát triển)\n";
-        cout << "4. Quản lý nhân viên\n";
-        cout << "5. Quản lý kho                (đang phát triển)\n";
-        cout << "6. Quản lý thu - chi          (đang phát triển)\n";
-        cout << "7. Thống kê & báo cáo         (đang phát triển)\n";
-        cout << "0. Đăng xuất\n";
-        cout << "==================================\n";
-        cout << "Chọn chức năng: ";
-        cin >> luaChon;
+        vector<string> dsMenu = {
+            "1. Bán hàng (đang phát triển)",
+            "2. Quản lý thực đơn",
+            "3. Quản lý khách hàng (đang phát triển)",
+            "4. Quản lý nhân viên",
+            "5. Quản lý kho (đang phát triển)",
+            "6. Quản lý thu - chi (đang phát triển)",
+            "7. Thống kê & báo cáo (đang phát triển)",
+            "0. Đăng xuất"
+        };
 
-        switch (luaChon)
+        string tieuDe = "MENU QUẢN LÝ — Xin chào, " + nguoiDung.layHoTen() +
+                         " (" + nguoiDung.layTenVaiTro() + ")";
+        int vtChon = chonMenuMuiTen(tieuDe, dsMenu);
+        string muc = dsMenu[vtChon];
+
+        if (muc.find("Bán hàng") != string::npos)
         {
-        case 1:
+            xoaManHinh();
             cout << "\nChức năng bán hàng đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 2:
+        }
+        else if (muc.find("Quản lý thực đơn") != string::npos)
         {
             QuanLyMonAn qlMonAn;
             qlMonAn.hienThiMenu(nguoiDung);
-            break;
         }
-        case 3:
+        else if (muc.find("khách hàng") != string::npos)
+        {
+            xoaManHinh();
             cout << "\nChức năng quản lý khách hàng đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 4:
-{
+        }
+        else if (muc.find("Quản lý nhân viên") != string::npos)
+        {
             QuanLyNhanVien qlNhanVien;
             qlNhanVien.hienThiMenu();
-            break;
-}
-        case 5:
+        }
+        else if (muc.find("Quản lý kho") != string::npos)
+        {
+            xoaManHinh();
             cout << "\nChức năng quản lý kho đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 6:
+        }
+        else if (muc.find("thu - chi") != string::npos)
+        {
+            xoaManHinh();
             cout << "\nChức năng quản lý thu - chi đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 7:
+        }
+        else if (muc.find("Thống kê") != string::npos)
+        {
+            xoaManHinh();
             cout << "\nChức năng thống kê & báo cáo đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 0:
-            cout << "\nĐã đăng xuất. Hẹn gặp lại!\n";
-            break;
-        default:
-            cout << "\nLựa chọn không hợp lệ, vui lòng chọn lại!\n";
-            dungManHinh();
         }
-    } while (luaChon != 0);
+        else if (muc.find("Đăng xuất") != string::npos)
+        {
+            xoaManHinh();
+            cout << "\nĐã đăng xuất. Hẹn gặp lại!\n";
+            dungManHinh();
+            return;
+        }
+    }
 }
 
 void Dashboard::menuThuNgan(const NguoiDung &nguoiDung)
 {
-    int luaChon;
-    do
+    while (true)
     {
-        xoaManHinh();
-        veKhungTieuDe("MENU THU NGÂN");
-        cout << "\nXin chào, " << nguoiDung.layHoTen() << " (" << nguoiDung.layTenVaiTro() << ")\n\n";
-        cout << "1. Bán hàng                  (đang phát triển)\n";
-        cout << "2. Xem thực đơn\n";
-        cout << "3. Quản lý khách hàng         (đang phát triển)\n";
-        cout << "4. Xem hóa đơn                (đang phát triển)\n";
-        cout << "0. Đăng xuất\n";
-        cout << "==================================\n";
-        cout << "Chọn chức năng: ";
-        cin >> luaChon;
+        vector<string> dsMenu = {
+            "1. Bán hàng (đang phát triển)",
+            "2. Xem thực đơn",
+            "3. Quản lý khách hàng (đang phát triển)",
+            "4. Xem hóa đơn (đang phát triển)",
+            "0. Đăng xuất"
+        };
 
-        switch (luaChon)
+        string tieuDe = "MENU THU NGÂN — Xin chào, " + nguoiDung.layHoTen() +
+                         " (" + nguoiDung.layTenVaiTro() + ")";
+        int vtChon = chonMenuMuiTen(tieuDe, dsMenu);
+        string muc = dsMenu[vtChon];
+
+        if (muc.find("Bán hàng") != string::npos)
         {
-        case 1:
+            xoaManHinh();
             cout << "\nChức năng bán hàng đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 2:
+        }
+        else if (muc.find("Xem thực đơn") != string::npos)
         {
             QuanLyMonAn qlMonAn;
-            qlMonAn.hienThiMenu(nguoiDung); // ben trong tu gioi han quyen theo vai tro
-            break;
+            qlMonAn.hienThiMenu(nguoiDung);
         }
-        case 3:
+        else if (muc.find("khách hàng") != string::npos)
+        {
+            xoaManHinh();
             cout << "\nChức năng quản lý khách hàng đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 4:
+        }
+        else if (muc.find("hóa đơn") != string::npos)
+        {
+            xoaManHinh();
             cout << "\nChức năng xem hóa đơn đang được phát triển.\n";
             dungManHinh();
-            break;
-        case 0:
-            cout << "\nĐã đăng xuất. Hẹn gặp lại!\n";
-            break;
-        default:
-            cout << "\nLựa chọn không hợp lệ, vui lòng chọn lại!\n";
-            dungManHinh();
         }
-    } while (luaChon != 0);
+        else if (muc.find("Đăng xuất") != string::npos)
+        {
+            xoaManHinh();
+            cout << "\nĐã đăng xuất. Hẹn gặp lại!\n";
+            dungManHinh();
+            return;
+        }
+    }
 }
 
 void Dashboard::chay()
@@ -132,12 +141,15 @@ void Dashboard::chay()
         else
             menuThuNgan(nguoiDung);
 
-        // Sau khi dang xuat, quay lai man hinh dang nhap; hoi co muon thoat khong
-        cout << "\nBạn có muốn thoát chương trình không? (1: Có, 0: Đăng nhập lại): ";
-        int thoat;
-        cin >> thoat;
-        if (thoat == 1)
+        vector<string> dsThoat = {
+            "0. Đăng nhập lại",
+            "1. Thoát chương trình"
+        };
+        int vtChon = chonMenuMuiTen("Bạn có muốn thoát chương trình không?", dsThoat);
+
+        if (vtChon == 1)
         {
+            xoaManHinh();
             cout << "\nĐã thoát chương trình. Hẹn gặp lại!\n";
             break;
         }

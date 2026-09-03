@@ -6,6 +6,7 @@
 #include <limits>
 #include <sstream>
 #include <cstdlib>
+#include <algorithm>
 using namespace std;
 
 // ============================================================
@@ -100,9 +101,16 @@ void MonAn::hienThi() const
     cout << "  Trạng thái: " << layTenTrangThai() << endl;
     if (!moTa.empty()) cout << "  Mô tả: " << moTa << endl;
     if (!tuyChonPhucVu.empty())
-    {
         cout << "  Sở thích phục vụ: " << tuyChonPhucVu << endl;
-    }
+}
+
+void MonAn::hienThiNgan(int stt) const
+{
+    cout << "  [" << stt << "] " << maMon << " | " << tenMon << "\n";
+    cout << "      📂 " << loaiMon;
+    cout << " | 💰 " << fixed << setprecision(0) << gia << " VND";
+    cout << " | 📦 " << donViTinh;
+    cout << " | " << layTenTrangThai() << "\n";
 }
 
 string MonAn::chuyenThanhDong() const
@@ -155,7 +163,7 @@ void MonAn::docTuDong(const string &dong)
 }
 
 // ============================================================
-// QUANLYMONAN
+// QUANLYMONAN - KHOI TAO / FILE
 // ============================================================
 QuanLyMonAn::QuanLyMonAn()
 {
@@ -165,10 +173,8 @@ QuanLyMonAn::QuanLyMonAn()
 int QuanLyMonAn::timViTriTheoMa(string maMon) const
 {
     for (size_t i = 0; i < danhSach.size(); i++)
-    {
         if (danhSach[i].layMaMon() == maMon)
             return (int)i;
-    }
     return -1;
 }
 
@@ -205,96 +211,13 @@ void QuanLyMonAn::ghiFile() const
         return;
     }
     for (size_t i = 0; i < danhSach.size(); i++)
-    {
         f << danhSach[i].chuyenThanhDong() << endl;
-    }
     f.close();
 }
 
-void QuanLyMonAn::xemDanhSach() const
-{
-    xoaManHinh();
-    
-    if (danhSach.empty())
-    {
-        cout << "\n  ⚠ Danh sách món ăn đang trống.\n";
-        dungManHinh();
-        return;
-    }
-
-    const int SO_MON_TREN_TRANG = 10;
-    int tongTrang = (danhSach.size() + SO_MON_TREN_TRANG - 1) / SO_MON_TREN_TRANG;
-    int trangHienTai = 1;
-
-    while (true)
-    {
-        xoaManHinh();
-        
-        cout << "\n  ═══════════════════════════════════════════════\n";
-        cout << "  📋 DANH SÁCH THỰC ĐƠN\n";
-        cout << "  Trang " << trangHienTai << "/" << tongTrang << " | Tổng: " << danhSach.size() << " món\n";
-        cout << "  ═══════════════════════════════════════════════\n\n";
-
-        int start = (trangHienTai - 1) * SO_MON_TREN_TRANG;
-        int end = min(start + SO_MON_TREN_TRANG, (int)danhSach.size());
-
-        for (int i = start; i < end; i++)
-        {
-            const MonAn &mon = danhSach[i];
-            cout << "  ─────────────────────────────────────────────\n";
-            cout << "  [" << (i + 1) << "] ";
-            cout << mon.layMaMon() << " | " << mon.layTenMon() << "\n";
-            cout << "      📂 " << mon.layLoaiMon();
-            cout << " | 💰 " << fixed << setprecision(0) << mon.layGia() << " VND";
-            cout << " | 📦 " << mon.layDonViTinh();
-            cout << " | " << mon.layTenTrangThai() << "\n";
-            if (!mon.layTuyChonPhucVu().empty())
-            {
-                cout << "      ⚙️ " << mon.layTuyChonPhucVu() << "\n";
-            }
-        }
-        cout << "  ─────────────────────────────────────────────\n";
-
-        if (tongTrang > 1)
-        {
-            cout << "\n  [N] Trang sau  [P] Trang trước  [Q] Thoát\n";
-            cout << "  Lựa chọn: ";
-            char luaChonTrang;
-            cin >> luaChonTrang;
-
-            if (luaChonTrang == 'n' || luaChonTrang == 'N')
-            {
-                if (trangHienTai < tongTrang)
-                    trangHienTai++;
-                else
-                {
-                    cout << "\n  ⚠ Đã ở trang cuối!\n";
-                    dungManHinh();
-                }
-            }
-            else if (luaChonTrang == 'p' || luaChonTrang == 'P')
-            {
-                if (trangHienTai > 1)
-                    trangHienTai--;
-                else
-                {
-                    cout << "\n  ⚠ Đã ở trang đầu!\n";
-                    dungManHinh();
-                }
-            }
-            else if (luaChonTrang == 'q' || luaChonTrang == 'Q')
-            {
-                break;
-            }
-        }
-        else
-        {
-            dungManHinh();
-            break;
-        }
-    }
-}
-
+// ============================================================
+// CAC HAM NHAP NGUYEN LIEU / THANH PHAN / TUY CHON (giu logic cu)
+// ============================================================
 void QuanLyMonAn::nhapNguyenLieu(MonAn &mon)
 {
     string nguyenLieu = mon.layNguyenLieu();
@@ -355,7 +278,7 @@ void QuanLyMonAn::nhapNguyenLieu(MonAn &mon)
             if (!nguyenLieu.empty())
                 nguyenLieu += ";";
             nguyenLieu += oss.str();
-            
+
             xoaManHinh();
             cout << "\n  ✅ Đã thêm nguyên liệu!\n";
             dungManHinh();
@@ -435,7 +358,7 @@ void QuanLyMonAn::nhapThanhPhanNhom(MonAn &mon)
             if (!thanhPhan.empty())
                 thanhPhan += ";";
             thanhPhan += oss.str();
-            
+
             xoaManHinh();
             cout << "\n  ✅ Đã thêm thành phần!\n";
             dungManHinh();
@@ -505,7 +428,7 @@ void QuanLyMonAn::nhapTuyChonPhucVu(MonAn &mon)
             if (!tuyChon.empty())
                 tuyChon += ";";
             tuyChon += ten + ":" + luaChonList;
-            
+
             xoaManHinh();
             cout << "\n  ✅ Đã thêm tùy chọn!\n";
             dungManHinh();
@@ -522,32 +445,42 @@ void QuanLyMonAn::nhapTuyChonPhucVu(MonAn &mon)
     mon.datTuyChonPhucVu(tuyChon);
 }
 
+// ============================================================
+// THEM MON - GIAO DIEN MOI (chon bang mui ten)
+// ============================================================
 void QuanLyMonAn::themMon()
 {
+    // BUOC 1: Chon loai kieu mon
+    vector<string> dsKieuMon = {
+        "1. Món thông thường",
+        "2. Món theo nguyên liệu",
+        "3. Món theo nhóm"
+    };
+    int viTriKieu = chonMenuMuiTen("➕ THÊM MÓN MỚI — BƯỚC 1: CHỌN LOẠI MÓN", dsKieuMon);
+    int kieu = viTriKieu + 1;
+
+    // Nhap ma mon
     string ma;
     bool maHopLe;
-    
     do
     {
         xoaManHinh();
         cout << "\n  ═══════════════════════════════════════════════\n";
-        cout << "  ➕ THÊM MÓN MỚI\n";
+        cout << "  ➕ THÊM MÓN MỚI — BƯỚC 2: THÔNG TIN CƠ BẢN\n";
         cout << "  ═══════════════════════════════════════════════\n\n";
-        
-        cout << "  Nhập mã món (VD: P001, C002, T003...): ";
+        cout << "  Mã món (VD: P001, C002, T003...): ";
         cin >> ma;
-        
+
         if (ma.empty())
         {
-            cout << "\n  ❌ Mã không được để trống! Vui lòng nhập lại.\n";
+            cout << "\n  ❌ Mã không được để trống!\n";
             dungManHinh();
             maHopLe = false;
             continue;
         }
-        
         if (kiemTraMaTonTai(ma))
         {
-            cout << "\n  ❌ Mã \"" << ma << "\" đã tồn tại! Vui lòng nhập mã khác.\n";
+            cout << "\n  ❌ Mã \"" << ma << "\" đã tồn tại!\n";
             dungManHinh();
             maHopLe = false;
         }
@@ -557,36 +490,43 @@ void QuanLyMonAn::themMon()
         }
     } while (!maHopLe);
 
-    xoaManHinh();
-    cout << "\n  ═══════════════════════════════════════════════\n";
-    cout << "  ➕ THÊM MÓN MỚI\n";
-    cout << "  Mã món: " << ma << "\n";
-    cout << "  ═══════════════════════════════════════════════\n\n";
-
-    cout << "  Loại món:\n";
-    cout << "    1. Món thông thường\n";
-    cout << "    2. Món theo nguyên liệu\n";
-    cout << "    3. Món theo nhóm\n";
-    cout << "  Chọn: ";
-    int kieu;
-    cin >> kieu;
-    while (kieu < 1 || kieu > 3)
-    {
-        cout << "  Lựa chọn không hợp lệ, nhập lại: ";
-        cin >> kieu;
-    }
-
-    string ten, loai, donVi, moTa;
-    double gia;
+    string ten;
     cin.ignore();
-
-    cout << "\n  Thông tin món:\n";
     cout << "  Tên món: ";
     getline(cin, ten);
-    cout << "  Nhóm (Khai vị/Món chính/Đồ uống/Tráng miệng...): ";
-    getline(cin, loai);
-    cout << "  Đơn vị tính (Tô/Phần/Ly/Chai...): ";
-    getline(cin, donVi);
+
+    // Chon nhom mon bang mui ten
+    vector<string> dsNhomMon = {
+        "1. Khai vị",
+        "2. Món chính",
+        "3. Đồ uống",
+        "4. Tráng miệng"
+    };
+    string tieuDeNhom = "➕ THÊM MÓN MỚI — Chọn Nhóm món cho \"" + ten + "\"";
+    int viTriNhom = chonMenuMuiTen(tieuDeNhom, dsNhomMon);
+    string tenNhom[] = {"Khai vị", "Món chính", "Đồ uống", "Tráng miệng"};
+    string loai = tenNhom[viTriNhom];
+
+    // Chon don vi tinh bang mui ten
+    vector<string> dsDonVi = {
+        "1. Phần",
+        "2. Tô / Bát",
+        "3. Ly / Cốc",
+        "4. Chai / Lon",
+        "5. Dĩa / Đĩa"
+    };
+    string tieuDeDonVi = "➕ THÊM MÓN MỚI — BƯỚC 3: ĐƠN VỊ TÍNH cho \"" + ten + "\"";
+    int viTriDonVi = chonMenuMuiTen(tieuDeDonVi, dsDonVi);
+    string tenDonVi[] = {"Phần", "Tô/Bát", "Ly/Cốc", "Chai/Lon", "Dĩa/Đĩa"};
+    string donVi = tenDonVi[viTriDonVi];
+
+    // BUOC 4: Gia, mo ta, trang thai
+    xoaManHinh();
+    cout << "\n  ═══════════════════════════════════════════════\n";
+    cout << "  ➕ THÊM MÓN MỚI — BƯỚC 4: HOÀN TẤT\n";
+    cout << "  ═══════════════════════════════════════════════\n\n";
+
+    double gia;
     cout << "  Giá bán (VND): ";
     cin >> gia;
     while (cin.fail() || gia < 0)
@@ -597,23 +537,23 @@ void QuanLyMonAn::themMon()
         cin >> gia;
     }
     cin.ignore();
-    cout << "  Mô tả: ";
+
+    string moTa;
+    cout << "  Mô tả món: ";
     getline(cin, moTa);
 
+    vector<string> dsTrangThai = {
+        "1. Đang bán",
+        "2. Tạm hết",
+        "3. Ngừng kinh doanh"
+    };
+    int viTriTrangThai = chonMenuMuiTen("Chọn Trạng thái kinh doanh", dsTrangThai);
+    int trangThai = viTriTrangThai + 1;
+
     MonAn monMoi(ma, ten, loai, gia);
-    monMoi.datDonViTinh(donVi.empty() ? "Phần" : donVi);
+    monMoi.datDonViTinh(donVi);
     monMoi.datMoTa(moTa);
     monMoi.datKieuMon(kieu);
-
-    cout << "\n  Trạng thái:\n";
-    cout << "    1. Đang bán\n";
-    cout << "    2. Tạm hết\n";
-    cout << "    3. Ngừng kinh doanh\n";
-    cout << "  Chọn: ";
-    int trangThai;
-    cin >> trangThai;
-    if (trangThai < 1 || trangThai > 3)
-        trangThai = DANG_BAN;
     monMoi.datTrangThai(trangThai);
 
     if (kieu == MON_THEO_NGUYEN_LIEU)
@@ -621,21 +561,18 @@ void QuanLyMonAn::themMon()
     else if (kieu == MON_THEO_NHOM)
         nhapThanhPhanNhom(monMoi);
 
-    // Hỏi có muốn thêm sở thích phục vụ không
     xoaManHinh();
     cout << "\n  ═══════════════════════════════════════════════\n";
     cout << "  📋 THÔNG TIN MÓN MỚI\n";
     cout << "  ═══════════════════════════════════════════════\n\n";
     monMoi.hienThi();
     cout << "  ═══════════════════════════════════════════════\n";
-    
+
     cout << "\n  Bạn có muốn thêm sở thích phục vụ không? (1: Có, 0: Không): ";
     int themTuyChon;
     cin >> themTuyChon;
     if (themTuyChon == 1)
-    {
         nhapTuyChonPhucVu(monMoi);
-    }
 
     xoaManHinh();
     cout << "\n  ═══════════════════════════════════════════════\n";
@@ -664,6 +601,163 @@ void QuanLyMonAn::themMon()
     dungManHinh();
 }
 
+// ============================================================
+// SUA MOT MON - dung chung cho ca luong Danh sach va Tim kiem
+// ============================================================
+void QuanLyMonAn::suaMotMon(int viTri)
+{
+    bool tiepTucSua = true;
+    while (tiepTucSua)
+    {
+        xoaManHinh();
+        cout << "\n  ═══════════════════════════════════════════════\n";
+        cout << "  ✏️ CHỈNH SỬA MÓN — [" << danhSach[viTri].layMaMon() << "] "
+             << danhSach[viTri].layTenMon() << "\n";
+        cout << "  ═══════════════════════════════════════════════\n\n";
+        cout << "  📋 THÔNG TIN HIỆN TẠI:\n";
+        cout << "  • Tên món     : " << danhSach[viTri].layTenMon() << "\n";
+        cout << "  • Nhóm món    : " << danhSach[viTri].layLoaiMon() << "\n";
+        cout << "  • Giá bán     : " << fixed << setprecision(0) << danhSach[viTri].layGia() << " VND\n";
+        cout << "  • Đơn vị tính : " << danhSach[viTri].layDonViTinh() << "\n";
+        cout << "  • Trạng thái  : " << danhSach[viTri].layTenTrangThai() << "\n";
+        if (!danhSach[viTri].layMoTa().empty())
+            cout << "  • Mô tả       : " << danhSach[viTri].layMoTa() << "\n";
+        if (!danhSach[viTri].layTuyChonPhucVu().empty())
+            cout << "  • Sở thích    : " << danhSach[viTri].layTuyChonPhucVu() << "\n";
+        cout << "  ────────────────────────────────────────────────\n";
+
+        vector<string> dsMucSua = {
+            "1. ✏️ Đổi tên món (Nhập tay)",
+            "2. 📂 Đổi Nhóm món (Chọn mũi tên)",
+            "3. 💰 Đổi Giá bán (Nhập tay)",
+            "4. 📦 Đổi Đơn vị tính (Chọn mũi tên)",
+            "5. 🔄 Đổi Trạng thái kinh doanh (Chọn mũi tên)",
+            "6. 📝 Đổi Mô tả món (Nhập tay)",
+            "7. 🍕 Sửa Thành phần / Nguyên liệu",
+            "8. ⚙️ Sửa Sở thích phục vụ",
+            "0. 💾 LƯU THAY ĐỔI & HOÀN TẤT"
+        };
+
+        int viTriChon = chonMenuMuiTen("", dsMucSua, 0);
+        int muc = viTriChon; // 0..8, tuong ung 1..8, 0(luu) o cuoi
+
+        // muc = 8 -> ung voi lua chon "0. LUU..." (vi tri cuoi cung trong vector)
+        if (muc == 8) // da chon dong cuoi (0. LUU THAY DOI)
+        {
+            tiepTucSua = false;
+            break;
+        }
+
+        int soThuTu = muc + 1; // 1..7
+
+        switch (soThuTu)
+        {
+        case 1:
+        {
+            string ten;
+            cin.ignore();
+            cout << "\n  ✏️ ĐỔI TÊN MÓN:\n";
+            cout << "  Tên hiện tại: " << danhSach[viTri].layTenMon() << "\n";
+            cout << "  Tên mới: ";
+            getline(cin, ten);
+            danhSach[viTri].datTenMon(ten);
+            cout << "\n  ✅ Đã cập nhật tên món!\n";
+            dungManHinh();
+            break;
+        }
+        case 2:
+        {
+            vector<string> dsNhom = {"1. Khai vị", "2. Món chính", "3. Đồ uống", "4. Tráng miệng"};
+            int vt = chonMenuMuiTen("📂 CHỌN NHÓM MÓN MỚI", dsNhom);
+            string tenNhom[] = {"Khai vị", "Món chính", "Đồ uống", "Tráng miệng"};
+            danhSach[viTri].datLoaiMon(tenNhom[vt]);
+            xoaManHinh();
+            cout << "\n  ✅ Đã cập nhật Nhóm món thành \"" << tenNhom[vt] << "\"!\n";
+            dungManHinh();
+            break;
+        }
+        case 3:
+        {
+            double gia;
+            cout << "\n  💰 ĐỔI GIÁ BÁN:\n";
+            cout << "  Giá hiện tại: " << fixed << setprecision(0) << danhSach[viTri].layGia() << " VND\n";
+            cout << "  Nhập giá mới (VND): ";
+            cin >> gia;
+            while (cin.fail() || gia < 0)
+            {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "  Giá không hợp lệ, nhập lại: ";
+                cin >> gia;
+            }
+            danhSach[viTri].datGia(gia);
+            cout << "\n  ✅ Đã cập nhật Giá mới thành " << fixed << setprecision(0) << gia << " VND!\n";
+            dungManHinh();
+            break;
+        }
+        case 4:
+        {
+            vector<string> dsDonVi = {"1. Phần", "2. Tô / Bát", "3. Ly / Cốc", "4. Chai / Lon", "5. Dĩa / Đĩa"};
+            int vt = chonMenuMuiTen("📦 CHỌN ĐƠN VỊ TÍNH MỚI", dsDonVi);
+            string tenDonVi[] = {"Phần", "Tô/Bát", "Ly/Cốc", "Chai/Lon", "Dĩa/Đĩa"};
+            danhSach[viTri].datDonViTinh(tenDonVi[vt]);
+            xoaManHinh();
+            cout << "\n  ✅ Đã cập nhật Đơn vị tính thành \"" << tenDonVi[vt] << "\"!\n";
+            dungManHinh();
+            break;
+        }
+        case 5:
+        {
+            vector<string> dsTrangThai = {"1. Đang bán", "2. Tạm hết", "3. Ngừng kinh doanh"};
+            int vt = chonMenuMuiTen("🔄 CHỌN TRẠNG THÁI KINH DOANH MỚI", dsTrangThai);
+            danhSach[viTri].datTrangThai(vt + 1);
+            xoaManHinh();
+            cout << "\n  ✅ Đã cập nhật Trạng thái thành \"" << danhSach[viTri].layTenTrangThai() << "\"!\n";
+            dungManHinh();
+            break;
+        }
+        case 6:
+        {
+            string moTa;
+            cin.ignore();
+            cout << "\n  📝 ĐỔI MÔ TẢ MÓN:\n";
+            cout << "  Mô tả mới: ";
+            getline(cin, moTa);
+            danhSach[viTri].datMoTa(moTa);
+            cout << "\n  ✅ Đã cập nhật mô tả!\n";
+            dungManHinh();
+            break;
+        }
+        case 7:
+        {
+            int kieuMon = danhSach[viTri].layKieuMon();
+            if (kieuMon == MON_THEO_NGUYEN_LIEU)
+                nhapNguyenLieu(danhSach[viTri]);
+            else if (kieuMon == MON_THEO_NHOM)
+                nhapThanhPhanNhom(danhSach[viTri]);
+            else
+            {
+                xoaManHinh();
+                cout << "\n  ℹ️ Món này là món thường, không có nguyên liệu/thành phần.\n";
+                dungManHinh();
+            }
+            break;
+        }
+        case 8:
+        {
+            nhapTuyChonPhucVu(danhSach[viTri]);
+            break;
+        }
+        }
+    }
+
+    ghiFile();
+    xoaManHinh();
+    cout << "\n  ✅ Đã lưu các thay đổi!\n";
+    dungManHinh();
+}
+
+// suaMon() ban goc: nhap ma truc tiep (dung khi khong qua man hinh danh sach)
 void QuanLyMonAn::suaMon()
 {
     xoaManHinh();
@@ -690,154 +784,39 @@ void QuanLyMonAn::suaMon()
         return;
     }
 
+    suaMotMon(viTri);
+}
+
+// ============================================================
+// XOA MOT MON - dung chung, xoa xong quay lai danh sach
+// ============================================================
+void QuanLyMonAn::xoaMotMon(int viTri, const string &nhomDangLoc)
+{
     xoaManHinh();
     cout << "\n  ═══════════════════════════════════════════════\n";
-    cout << "  ✏️ SỬA MÓN\n";
+    cout << "  🗑️ XÓA MÓN\n";
     cout << "  ═══════════════════════════════════════════════\n";
-    cout << "  📋 Thông tin hiện tại:\n";
+    cout << "  📋 Món cần xóa:\n";
     cout << "  ─────────────────────────────────────────────\n";
     danhSach[viTri].hienThi();
     cout << "  ─────────────────────────────────────────────\n";
 
-    int luaChon;
-    do
+    cout << "\n  ⚠ Xác nhận xóa vĩnh viễn? (1: Có, 0: Không): ";
+    int xacNhan;
+    cin >> xacNhan;
+
+    if (xacNhan == 1)
     {
-        cout << "\n  Chọn thông tin cần sửa:\n";
-        cout << "    1. Tên món\n";
-        cout << "    2. Nhóm món\n";
-        cout << "    3. Đơn vị tính\n";
-        cout << "    4. Giá bán\n";
-        cout << "    5. Mô tả\n";
-        cout << "    6. Trạng thái\n";
-        cout << "    7. Nguyên liệu / Thành phần\n";
-        cout << "    8. Sở thích phục vụ\n";
-        cout << "    0. Hoàn tất\n";
-        cout << "  Chọn: ";
-        cin >> luaChon;
-
-        switch (luaChon)
-        {
-        case 1:
-        {
-            string ten;
-            cin.ignore();
-            cout << "  Tên mới: ";
-            getline(cin, ten);
-            danhSach[viTri].datTenMon(ten);
-            xoaManHinh();
-            cout << "\n  ✅ Đã cập nhật tên món!\n";
-            dungManHinh();
-            break;
-        }
-        case 2:
-        {
-            string loai;
-            cin.ignore();
-            cout << "  Nhóm mới: ";
-            getline(cin, loai);
-            danhSach[viTri].datLoaiMon(loai);
-            xoaManHinh();
-            cout << "\n  ✅ Đã cập nhật nhóm món!\n";
-            dungManHinh();
-            break;
-        }
-        case 3:
-        {
-            string donVi;
-            cin.ignore();
-            cout << "  Đơn vị tính mới: ";
-            getline(cin, donVi);
-            danhSach[viTri].datDonViTinh(donVi);
-            xoaManHinh();
-            cout << "\n  ✅ Đã cập nhật đơn vị tính!\n";
-            dungManHinh();
-            break;
-        }
-        case 4:
-        {
-            double gia;
-            cout << "  Giá cũ: " << fixed << setprecision(0) << danhSach[viTri].layGia() << " VND\n";
-            cout << "  Giá mới: ";
-            cin >> gia;
-            while (cin.fail() || gia < 0)
-            {
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "  Giá không hợp lệ, nhập lại: ";
-                cin >> gia;
-            }
-            danhSach[viTri].datGia(gia);
-            xoaManHinh();
-            cout << "\n  ✅ Đã cập nhật giá!\n";
-            dungManHinh();
-            break;
-        }
-        case 5:
-        {
-            string moTa;
-            cin.ignore();
-            cout << "  Mô tả mới: ";
-            getline(cin, moTa);
-            danhSach[viTri].datMoTa(moTa);
-            xoaManHinh();
-            cout << "\n  ✅ Đã cập nhật mô tả!\n";
-            dungManHinh();
-            break;
-        }
-        case 6:
-        {
-            cout << "  Trạng thái hiện tại: " << danhSach[viTri].layTenTrangThai() << endl;
-            cout << "    1. Đang bán\n";
-            cout << "    2. Tạm hết\n";
-            cout << "    3. Ngừng kinh doanh\n";
-            cout << "  Chọn: ";
-            int tt;
-            cin >> tt;
-            if (tt >= 1 && tt <= 3)
-            {
-                danhSach[viTri].datTrangThai(tt);
-                xoaManHinh();
-                cout << "\n  ✅ Đã chuyển sang: " << danhSach[viTri].layTenTrangThai() << endl;
-                dungManHinh();
-            }
-            else
-            {
-                cout << "  ❌ Lựa chọn không hợp lệ!\n";
-                dungManHinh();
-            }
-            break;
-        }
-        case 7:
-        {
-            int kieuMon = danhSach[viTri].layKieuMon();
-            if (kieuMon == MON_THEO_NGUYEN_LIEU)
-                nhapNguyenLieu(danhSach[viTri]);
-            else if (kieuMon == MON_THEO_NHOM)
-                nhapThanhPhanNhom(danhSach[viTri]);
-            else
-            {
-                xoaManHinh();
-                cout << "\n  ℹ️ Món này là món thường, không có nguyên liệu/thành phần.\n";
-                dungManHinh();
-            }
-            break;
-        }
-        case 8:
-        {
-            nhapTuyChonPhucVu(danhSach[viTri]);
-            break;
-        }
-        case 0:
-            break;
-        default:
-            cout << "  ❌ Lựa chọn không hợp lệ!\n";
-            dungManHinh();
-        }
-    } while (luaChon != 0);
-
-    ghiFile();
-    xoaManHinh();
-    cout << "\n  ✅ Đã lưu các thay đổi!\n";
+        danhSach.erase(danhSach.begin() + viTri);
+        ghiFile();
+        xoaManHinh();
+        cout << "\n  ✅ Đã xóa món ăn vĩnh viễn!\n";
+    }
+    else
+    {
+        xoaManHinh();
+        cout << "\n  Đã hủy thao tác xóa.\n";
+    }
     dungManHinh();
 }
 
@@ -867,34 +846,258 @@ void QuanLyMonAn::xoaMon()
         return;
     }
 
-    xoaManHinh();
-    cout << "\n  ═══════════════════════════════════════════════\n";
-    cout << "  🗑️ XÓA MÓN\n";
-    cout << "  ═══════════════════════════════════════════════\n";
-    cout << "  📋 Món cần xóa:\n";
-    cout << "  ─────────────────────────────────────────────\n";
-    danhSach[viTri].hienThi();
-    cout << "  ─────────────────────────────────────────────\n";
-
-    cout << "\n  ⚠ Xác nhận xóa vĩnh viễn? (1: Có, 0: Không): ";
-    int xacNhan;
-    cin >> xacNhan;
-
-    if (xacNhan == 1)
-    {
-        danhSach.erase(danhSach.begin() + viTri);
-        ghiFile();
-        xoaManHinh();
-        cout << "\n  ✅ Đã xóa món ăn vĩnh viễn!\n";
-    }
-    else
-    {
-        xoaManHinh();
-        cout << "\n  Đã hủy thao tác xóa.\n";
-    }
-    dungManHinh();
+    xoaMotMon(viTri, "");
 }
 
+// ============================================================
+// LOC THEO NHOM
+// ============================================================
+vector<int> QuanLyMonAn::locTheoNhom(const string &nhom) const
+{
+    vector<int> ketQua;
+    for (size_t i = 0; i < danhSach.size(); i++)
+    {
+        if (nhom.empty() || danhSach[i].layLoaiMon() == nhom)
+            ketQua.push_back((int)i);
+    }
+    return ketQua;
+}
+
+// ============================================================
+// MAN HINH DANH SACH (co phan trang + thao tac inline)
+// ============================================================
+void QuanLyMonAn::manHinhDanhSach(const string &nhomDangLoc)
+{
+    const int SO_MON_TREN_TRANG = 10;
+    int trangHienTai = 1;
+
+    while (true)
+    {
+        vector<int> dsViTri = locTheoNhom(nhomDangLoc);
+
+        if (dsViTri.empty())
+        {
+            xoaManHinh();
+            cout << "\n  ⚠ Không có món nào trong nhóm này.\n";
+            dungManHinh();
+            return;
+        }
+
+        int tongTrang = ((int)dsViTri.size() + SO_MON_TREN_TRANG - 1) / SO_MON_TREN_TRANG;
+        if (trangHienTai > tongTrang) trangHienTai = tongTrang;
+        if (trangHienTai < 1) trangHienTai = 1;
+
+        int start = (trangHienTai - 1) * SO_MON_TREN_TRANG;
+        int end = min(start + SO_MON_TREN_TRANG, (int)dsViTri.size());
+
+        // KHAI BÁO MỚI Ở ĐÂY ĐỂ RESET CHUỖI MỖI LẦN VẼ LẠI
+        ostringstream ossDanhSach;
+        ossDanhSach << fixed << setprecision(0);
+
+        string tenNhomHienThi = nhomDangLoc.empty() ? "Tất cả" : nhomDangLoc;
+        ossDanhSach << "\n  ════════════════════════════════════════════════════\n";
+        ossDanhSach << "  📋 DANH SÁCH THỰC ĐƠN — Lọc: " << tenNhomHienThi
+                    << " (Hiển thị " << (end - start) << "/" << dsViTri.size() << " món)\n";
+        ossDanhSach << "  ════════════════════════════════════════════════════\n\n";
+
+        for (int i = start; i < end; i++)
+        {
+            const MonAn &mon = danhSach[dsViTri[i]];
+            ossDanhSach << "  [" << (i + 1) << "] " << mon.layMaMon() << " | " << mon.layTenMon() << "\n";
+            ossDanhSach << "      📂 " << mon.layLoaiMon()
+                        << " | 💰 " << (long long)mon.layGia() << " VND"
+                        << " | 📦 " << mon.layDonViTinh()
+                        << " | " << mon.layTenTrangThai() << "\n";
+            ossDanhSach << "  ────────────────────────────────────────────────────\n";
+        }
+
+        vector<string> dsThaoTac;
+        bool coTrangSau = (trangHienTai < tongTrang);
+        bool coTrangTruoc = (trangHienTai > 1);
+
+        if (coTrangSau)
+            dsThaoTac.push_back("➔ Xem thêm (Trang sau: " + to_string(trangHienTai + 1) + "/" + to_string(tongTrang) + ")");
+        if (coTrangTruoc)
+            dsThaoTac.push_back("⬅ Trang trước (" + to_string(trangHienTai - 1) + "/" + to_string(tongTrang) + ")");
+        dsThaoTac.push_back("1. ✏️ Sửa món");
+        dsThaoTac.push_back("2. 🗑️ Xóa món");
+        dsThaoTac.push_back("3. 🔍 Tìm kiếm món");
+        dsThaoTac.push_back("4. 🍕 Quản lý món theo nhóm");
+        dsThaoTac.push_back("5. ⚙️ Quản lý sở thích phục vụ");
+        dsThaoTac.push_back("0. ⬅️ Quay lại chọn nhóm món");
+
+        int vtChon = chonMenuMuiTen("⚙️ THAO TÁC TRÊN DANH SÁCH:", dsThaoTac, 0, true, ossDanhSach.str());
+
+        if (vtChon == -1)
+            return;
+
+        string thaoTacDaChon = dsThaoTac[vtChon];
+
+        if (thaoTacDaChon.find("Trang sau") != string::npos)
+        {
+            trangHienTai++;
+        }
+        else if (thaoTacDaChon.find("Trang trước") != string::npos)
+        {
+            trangHienTai--;
+        }
+        else if (thaoTacDaChon.find("Sửa món") != string::npos)
+        {
+            vector<string> dsMonChon;
+            for (int i = start; i < end; i++)
+                dsMonChon.push_back(to_string(i + 1) + ". " + danhSach[dsViTri[i]].layMaMon() +
+                                     " | " + danhSach[dsViTri[i]].layTenMon());
+            dsMonChon.push_back("0. ⬅️ Hủy bỏ (Quay lại danh sách)");
+
+            int vtMon = chonMenuMuiTen("✏️ SỬA MÓN — VUI LÒNG CHỌN MÓN CẦN SỬA", dsMonChon);
+            if (vtMon != -1 && vtMon != (int)dsMonChon.size() - 1)
+            {
+                int viTriThuc = dsViTri[start + vtMon];
+                suaMotMon(viTriThuc);
+            }
+        }
+        else if (thaoTacDaChon.find("Xóa món") != string::npos)
+        {
+            vector<string> dsMonChon;
+            for (int i = start; i < end; i++)
+                dsMonChon.push_back(to_string(i + 1) + ". " + danhSach[dsViTri[i]].layMaMon() +
+                                     " | " + danhSach[dsViTri[i]].layTenMon());
+            dsMonChon.push_back("0. ⬅️ Hủy bỏ (Quay lại danh sách)");
+
+            int vtMon = chonMenuMuiTen("🗑️ XÓA MÓN — VUI LÒNG CHỌN MÓN CẦN XÓA", dsMonChon);
+            if (vtMon != -1 && vtMon != (int)dsMonChon.size() - 1)
+            {
+                int viTriThuc = dsViTri[start + vtMon];
+                xoaMotMon(viTriThuc, nhomDangLoc);
+            }
+        }
+        else if (thaoTacDaChon.find("Tìm kiếm món") != string::npos)
+        {
+            manHinhKetQuaTimKiem(nhomDangLoc);
+        }
+        else if (thaoTacDaChon.find("Quản lý món theo nhóm") != string::npos)
+        {
+            quanLyMonTheoNhom();
+        }
+        else if (thaoTacDaChon.find("sở thích phục vụ") != string::npos)
+        {
+            quanLySoThichPhucVu();
+        }
+        else if (thaoTacDaChon.find("Quay lại") != string::npos)
+        {
+            return;
+        }
+    }
+}
+
+// ============================================================
+// MAN HINH KET QUA TIM KIEM (co thao tac inline + huy tim kiem)
+// ============================================================
+void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
+{
+    while (true)
+    {
+        xoaManHinh();
+        string tuKhoa;
+        
+        cout << "\n  ═══════════════════════════════════════════════\n";
+        cout << "  🔍 TÌM KIẾM MÓN\n";
+        cout << "  ═══════════════════════════════════════════════\n";
+        cout << "  Nhập tên cần tìm (hoặc nhấn Enter để hủy): ";
+        
+        // KHÔNG DÙNG cin.ignore() ở đây vì dùng menu mũi tên không bị sót bộ đệm
+        cin.clear();
+        getline(cin, tuKhoa);
+
+        if (tuKhoa.empty())
+        {
+            return; // Nếu bấm Enter không nhập gì thì tự động quay lại danh sách
+        }
+
+        string tuKhoaThuong = tuKhoa;
+        for (char &c : tuKhoaThuong) c = tolower(c);
+
+        vector<int> viTriTimThay;
+        for (size_t i = 0; i < danhSach.size(); i++)
+        {
+            string tenMonThuong = danhSach[i].layTenMon();
+            for (char &c : tenMonThuong) c = tolower(c);
+            if (tenMonThuong.find(tuKhoaThuong) != string::npos)
+                viTriTimThay.push_back((int)i);
+        }
+
+        if (viTriTimThay.empty())
+        {
+            xoaManHinh();
+            cout << "\n  ❌ Không tìm thấy món nào khớp với từ khóa \"" << tuKhoa << "\".\n";
+            dungManHinh();
+            return;
+        }
+
+        // Gom danh sách kết quả tìm kiếm vào ostringstream
+        ostringstream ossKetQua;
+        ossKetQua << fixed << setprecision(0);
+        ossKetQua << "\n  ════════════════════════════════════════════════════\n";
+        ossKetQua << "  🔍 KẾT QUẢ TÌM KIẾM — Từ khóa: \"" << tuKhoa << "\" (Tìm thấy "
+                  << viTriTimThay.size() << " món)\n";
+        ossKetQua << "  ════════════════════════════════════════════════════\n\n";
+
+        for (size_t i = 0; i < viTriTimThay.size(); i++)
+        {
+            const MonAn &mon = danhSach[viTriTimThay[i]];
+            ossKetQua << "  [" << (i + 1) << "] " << mon.layMaMon() << " | " << mon.layTenMon() << "\n";
+            ossKetQua << "      📂 " << mon.layLoaiMon()
+                      << " | 💰 " << (long long)mon.layGia() << " VND"
+                      << " | 📦 " << mon.layDonViTinh()
+                      << " | " << mon.layTenTrangThai() << "\n";
+            ossKetQua << "  ────────────────────────────────────────────────────\n";
+        }
+
+        vector<string> dsThaoTac = {
+            "1. ✏️ Sửa món trong kết quả",
+            "2. 🗑️ Xóa món trong kết quả",
+            "3. 🔍 Tìm kiếm từ khóa khác",
+            "0. ❌ Hủy tìm kiếm (Quay lại danh sách)"
+        };
+
+        int vtChon = chonMenuMuiTen("⚙️ THAO TÁC KẾT QUẢ TÌM KIẾM", dsThaoTac, 0, true, ossKetQua.str());
+
+        if (vtChon == -1 || vtChon == 3) // Chọn "0. Hủy tìm kiếm" hoặc ấn ESC
+        {
+            return;
+        }
+
+        if (dsThaoTac[vtChon].find("Sửa món") != string::npos)
+        {
+            vector<string> dsMonChon;
+            for (size_t i = 0; i < viTriTimThay.size(); i++)
+                dsMonChon.push_back(to_string(i + 1) + ". " + danhSach[viTriTimThay[i]].layMaMon() +
+                                     " | " + danhSach[viTriTimThay[i]].layTenMon());
+            dsMonChon.push_back("0. ⬅️ Hủy bỏ");
+
+            int vtMon = chonMenuMuiTen("✏️ CHỌN MÓN CẦN SỬA", dsMonChon);
+            if (vtMon != -1 && vtMon != (int)dsMonChon.size() - 1)
+                suaMotMon(viTriTimThay[vtMon]);
+        }
+        else if (dsThaoTac[vtChon].find("Xóa món") != string::npos)
+        {
+            vector<string> dsMonChon;
+            for (size_t i = 0; i < viTriTimThay.size(); i++)
+                dsMonChon.push_back(to_string(i + 1) + ". " + danhSach[viTriTimThay[i]].layMaMon() +
+                                     " | " + danhSach[viTriTimThay[i]].layTenMon());
+            dsMonChon.push_back("0. ⬅️ Hủy bỏ");
+
+            int vtMon = chonMenuMuiTen("🗑️ CHỌN MÓN CẦN XÓA", dsMonChon);
+            if (vtMon != -1 && vtMon != (int)dsMonChon.size() - 1)
+                xoaMotMon(viTriTimThay[vtMon], nhomDangLoc);
+        }
+        else if (dsThaoTac[vtChon].find("từ khóa khác") != string::npos)
+        {
+            continue;
+        }
+    }
+}
+// timKiemTheoTen() giu ban const cu, dung khi goi truc tiep tu menu (khong qua danh sach)
 void QuanLyMonAn::timKiemTheoTen() const
 {
     xoaManHinh();
@@ -923,56 +1126,62 @@ void QuanLyMonAn::timKiemTheoTen() const
     }
 
     string tuKhoaThuong = tuKhoa;
-    for (char &c : tuKhoaThuong)
-        c = tolower(c);
+    for (char &c : tuKhoaThuong) c = tolower(c);
 
-    vector<int> viTriTimThay;
+    ostringstream ossKetQua;
+    ossKetQua << fixed << setprecision(0);
+    ossKetQua << "\n  ═══════════════════════════════════════════════\n";
+    ossKetQua << "  🔍 KẾT QUẢ TÌM KIẾM\n";
+    ossKetQua << "  Từ khóa: \"" << tuKhoa << "\"\n";
+    ossKetQua << "  ═══════════════════════════════════════════════\n\n";
+
+    int dem = 0;
     for (size_t i = 0; i < danhSach.size(); i++)
     {
-        string tenMon = danhSach[i].layTenMon();
-        string tenMonThuong = tenMon;
-        for (char &c : tenMonThuong)
-            c = tolower(c);
-
+        string tenMonThuong = danhSach[i].layTenMon();
+        for (char &c : tenMonThuong) c = tolower(c);
         if (tenMonThuong.find(tuKhoaThuong) != string::npos)
         {
-            viTriTimThay.push_back(i);
+            dem++;
+            ossKetQua << "  [" << dem << "] " << danhSach[i].layMaMon() << " | " << danhSach[i].layTenMon() << "\n";
+            ossKetQua << "      📂 " << danhSach[i].layLoaiMon()
+                      << " | 💰 " << (long long)danhSach[i].layGia() << " VND"
+                      << " | 📦 " << danhSach[i].layDonViTinh()
+                      << " | " << danhSach[i].layTenTrangThai() << "\n";
+            ossKetQua << "  ─────────────────────────────────────────────\n";
         }
     }
 
     xoaManHinh();
-    cout << "\n  ═══════════════════════════════════════════════\n";
-    cout << "  🔍 KẾT QUẢ TÌM KIẾM\n";
-    cout << "  Từ khóa: \"" << tuKhoa << "\"\n";
-    cout << "  Số lượng: " << viTriTimThay.size() << " món\n";
-    cout << "  ═══════════════════════════════════════════════\n\n";
-
-    if (viTriTimThay.empty())
+    if (dem == 0)
     {
-        cout << "  ❌ Không tìm thấy món nào.\n";
-        dungManHinh();
-        return;
+        cout << "\n  ❌ Không tìm thấy món nào khớp với từ khóa.\n";
     }
-
-    for (size_t i = 0; i < viTriTimThay.size(); i++)
+    else
     {
-        const MonAn &mon = danhSach[viTriTimThay[i]];
-        cout << "  ─────────────────────────────────────────────\n";
-        cout << "  [" << (i + 1) << "] ";
-        cout << mon.layMaMon() << " | " << mon.layTenMon() << "\n";
-        cout << "      📂 " << mon.layLoaiMon();
-        cout << " | 💰 " << fixed << setprecision(0) << mon.layGia() << " VND";
-        cout << " | " << mon.layTenTrangThai() << "\n";
-        if (!mon.layTuyChonPhucVu().empty())
-        {
-            cout << "      ⚙️ " << mon.layTuyChonPhucVu() << "\n";
-        }
+        cout << ossKetQua.str();
     }
-    cout << "  ─────────────────────────────────────────────\n";
-
     dungManHinh();
 }
 
+// xemDanhSach() const cu duoc giu (goi tu noi khac neu can) nhung KHONG dung trong menu moi
+void QuanLyMonAn::xemDanhSach() const
+{
+    xoaManHinh();
+    if (danhSach.empty())
+    {
+        cout << "\n  ⚠ Danh sách món ăn đang trống.\n";
+        dungManHinh();
+        return;
+    }
+    for (size_t i = 0; i < danhSach.size(); i++)
+        danhSach[i].hienThiNgan((int)i + 1);
+    dungManHinh();
+}
+
+// ============================================================
+// QUAN LY MON THEO NHOM / SO THICH PHUC VU (giu logic cu)
+// ============================================================
 void QuanLyMonAn::quanLyMonTheoNhom()
 {
     xoaManHinh();
@@ -1099,80 +1308,91 @@ void QuanLyMonAn::thongKeMon() const
     cout << "\n  ═══════════════════════════════════════════════\n";
     cout << "  📊 THỐNG KÊ MÓN ĂN\n";
     cout << "  ═══════════════════════════════════════════════\n\n";
-
     cout << "  Tổng số món: " << tongMon << endl;
     cout << "  ✅ Đang bán: " << soDangBan << endl;
     cout << "  ⏸️ Tạm hết: " << soTamHet << endl;
     cout << "  🚫 Ngừng KD: " << soNgungKD << endl;
-
     cout << "\n  📂 Phân loại theo nhóm:\n";
     for (int k = 0; k < soLoaiKhacNhau; k++)
-    {
         cout << "     • " << tenLoai[k] << ": " << soLuongLoai[k] << " món\n";
-    }
     cout << "  ═══════════════════════════════════════════════\n";
     dungManHinh();
 }
 
+// ============================================================
+// MENU CHINH - GIAO DIEN MOI (chi con 3 chuc nang, chon bang mui ten)
+// ============================================================
 void QuanLyMonAn::hienThiMenu(const NguoiDung &nguoiDung)
 {
     bool laQuanLy = (nguoiDung.layVaiTro() == QUAN_LY);
-    int luaChon;
-    do
+
+    while (true)
     {
-        xoaManHinh();
-        cout << "\n  ═══════════════════════════════════════════════\n";
-        cout << "  📋 QUẢN LÝ THỰC ĐƠN\n";
+        vector<string> dsMenu;
         if (laQuanLy)
         {
-            cout << "  ═══════════════════════════════════════════════\n\n";
-            cout << "    1. ➕ Thêm món\n";
-            cout << "    2. ✏️ Sửa món\n";
-            cout << "    3. 🗑️ Xóa món\n";
-            cout << "    4. 🔍 Tìm kiếm món\n";
-            cout << "    5. 📋 Xem danh sách\n";
-            cout << "    6. 🍕 Quản lý món theo nhóm\n";
-            cout << "    7. ⚙️ Quản lý sở thích phục vụ\n";
-            cout << "    8. 📊 Thống kê\n";
-            cout << "    0. ⬅️ Quay lại\n";
+            dsMenu = {
+                "1. 📋 Xem danh sách thực đơn",
+                "2. ➕ Thêm món mới",
+                "3. 📊 Thống kê món ăn",
+                "0. ⬅️ Quay lại Menu chính"
+            };
         }
         else
         {
-            cout << "  ═══════════════════════════════════════════════\n\n";
-            cout << "    4. 🔍 Tìm kiếm món\n";
-            cout << "    5. 📋 Xem danh sách\n";
-            cout << "    0. ⬅️ Quay lại\n";
-        }
-        cout << "  ═══════════════════════════════════════════════\n";
-        cout << "  Chọn: ";
-        cin >> luaChon;
-
-        if (!laQuanLy && luaChon != 4 && luaChon != 5 && luaChon != 0)
-        {
-            xoaManHinh();
-            cout << "\n  ⚠ Bạn không có quyền quản lý thực đơn.\n";
-            cout << "  Chỉ được phép XEM/TÌM KIẾM thực đơn.\n";
-            dungManHinh();
-            continue;
+            dsMenu = {
+                "1. 📋 Xem danh sách thực đơn",
+                "0. ⬅️ Quay lại Menu chính"
+            };
         }
 
-        switch (luaChon)
+        int vtChon = chonMenuMuiTen("📋 QUẢN LÝ THỰC ĐƠN", dsMenu);
+        string muc = dsMenu[vtChon];
+
+        if (muc.find("Xem danh sách") != string::npos)
         {
-        case 1: themMon(); break;
-        case 2: suaMon(); break;
-        case 3: xoaMon(); break;
-        case 4: timKiemTheoTen(); break;
-        case 5: xemDanhSach(); break;
-        case 6: quanLyMonTheoNhom(); break;
-        case 7: quanLySoThichPhucVu(); break;
-        case 8: thongKeMon(); break;
-        case 0:
-            cout << "\n  ⬅️ Quay lại...\n";
-            dungManHinh();
-            break;
-        default:
-            cout << "\n  ❌ Lựa chọn không hợp lệ!\n";
-            dungManHinh();
+            // Chon nhom mon can xem truoc
+            vector<string> dsNhomLoc = {
+                "1. 🌐 Tất cả các nhóm",
+                "2. 🥗 Khai vị",
+                "3. 🍲 Món chính",
+                "4. 🧋 Đồ uống",
+                "5. 🍰 Tráng miệng",
+                "0. ⬅️ Quay lại"
+            };
+            int vtNhom = chonMenuMuiTen("📂 CHỌN NHÓM MÓN CẦN XEM", dsNhomLoc);
+
+            if (vtNhom == (int)dsNhomLoc.size() - 1)
+                continue; // quay lai menu chinh
+
+            string tenNhomLoc[] = {"", "Khai vị", "Món chính", "Đồ uống", "Tráng miệng"};
+            manHinhDanhSach(tenNhomLoc[vtNhom]);
         }
-    } while (luaChon != 0);
+        else if (muc.find("Thêm món mới") != string::npos)
+        {
+            if (!laQuanLy)
+            {
+                xoaManHinh();
+                cout << "\n  ⚠ Bạn không có quyền thêm món.\n";
+                dungManHinh();
+                continue;
+            }
+            themMon();
+        }
+        else if (muc.find("Thống kê") != string::npos)
+        {
+            if (!laQuanLy)
+            {
+                xoaManHinh();
+                cout << "\n  ⚠ Bạn không có quyền xem thống kê.\n";
+                dungManHinh();
+                continue;
+            }
+            thongKeMon();
+        }
+        else if (muc.find("Quay lại Menu chính") != string::npos)
+        {
+            return;
+        }
+    }
 }

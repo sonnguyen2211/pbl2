@@ -1,4 +1,4 @@
-P001|Phở bò tái|Món chính|45000|0|1|Phở bò tái truyền thống|1|1|Lượng đường:0%,50%,100%||
+
 C001|Cơm tấm sườn bì chả|Món chính|40000|0|1|Cơm tấm kiểu Sài Gòn|3|3||cơm:15000;trứng:10000;chả:12000|
 B001|Bún chả Hà Nội|Món chính|42000|0|1|Bún chả nướng than hoa|1|1|||
 M001|Mì Quảng|Món chính|38000|0|1|Mì Quảng đặc sản miền Trung|1|1|||

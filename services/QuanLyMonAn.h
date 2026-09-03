@@ -6,9 +6,6 @@
 #include "QuanLyTaiKhoan.h"
 using namespace std;
 
-// ============================================================
-// ENUM TRANG THAI / KIEU MON
-// ============================================================
 enum TrangThaiMon
 {
     DANG_BAN = 1,
@@ -23,13 +20,10 @@ enum KieuMon
     MON_THEO_NHOM = 3
 };
 
-// ============================================================
-// CLASS MONAN
-// ============================================================
 class MonAn
 {
 private:
-    string maMon;          // Đổi từ int sang string
+    string maMon;
     string tenMon;
     string loaiMon;
     double gia;
@@ -45,7 +39,6 @@ public:
     MonAn();
     MonAn(string maMon, string tenMon, string loaiMon, double gia);
 
-    // Getter
     string layMaMon() const;
     string layTenMon() const;
     string layLoaiMon() const;
@@ -61,7 +54,6 @@ public:
     string layTuyChonPhucVu() const;
     string layThanhPhanNhom() const;
 
-    // Setter
     void datMaMon(string ma);
     void datTenMon(string ten);
     void datLoaiMon(string loai);
@@ -74,17 +66,13 @@ public:
     void datTuyChonPhucVu(string tc);
     void datThanhPhanNhom(string tp);
 
-    // Hien thi
     void hienThi() const;
+    void hienThiNgan(int stt) const; // hien thi rut gon trong danh sach
 
-    // Doc/ghi file
     string chuyenThanhDong() const;
     void docTuDong(const string &dong);
 };
 
-// ============================================================
-// CLASS QUANLYMONAN
-// ============================================================
 const string FILE_MON_AN = "data/monan.txt";
 
 class QuanLyMonAn
@@ -98,12 +86,18 @@ private:
     void nhapThanhPhanNhom(MonAn &mon);
     void nhapTuyChonPhucVu(MonAn &mon);
 
+    // Cac ham noi bo cho luong giao dien moi
+    vector<int> locTheoNhom(const string &nhom) const; // tra ve vi tri cac mon khop nhom, "" = tat ca
+    void manHinhDanhSach(const string &nhomDangLoc);    // man hinh danh sach + thao tac inline
+    void manHinhKetQuaTimKiem(const string &nhomDangLoc); // man hinh tim kiem + thao tac inline
+    void suaMotMon(int viTri); // bang dieu chinh cho 1 mon cu the (dung lai cho ca 2 luong tren)
+    void xoaMotMon(int viTri, const string &nhomDangLoc); // xoa 1 mon, quay lai danh sach
+
 public:
     QuanLyMonAn();
 
-    // Chức năng chính
     void themMon();
-    void suaMon();
+    void suaMon(); // gach chon mon roi goi suaMotMon() - dung khi vao truc tiep
     void xoaMon();
     void timKiemTheoTen() const;
     void xemDanhSach() const;
@@ -111,11 +105,9 @@ public:
     void quanLySoThichPhucVu();
     void thongKeMon() const;
 
-    // File
     void docFile();
     void ghiFile() const;
 
-    // Menu
     void hienThiMenu(const NguoiDung &nguoiDung);
 };
 
