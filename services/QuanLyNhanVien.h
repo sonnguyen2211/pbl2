@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "QuanLyTaiKhoan.h" // NhanVien ke thua tu NguoiDung
+#include "Quanlytaikhoan.h" // NhanVien ke thua tu NguoiDung
 using namespace std;
 
 // ============================================================

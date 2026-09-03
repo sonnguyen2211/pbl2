@@ -1,7 +1,7 @@
 #ifndef DASHBOARD_H
 #define DASHBOARD_H
 
-#include "QuanLyTaiKhoan.h" // can NguoiDung de truyen xuong cac menu con
+#include "services/Quanlytaikhoan.h" // can NguoiDung de truyen xuong cac menu con
 
 class Dashboard
 {

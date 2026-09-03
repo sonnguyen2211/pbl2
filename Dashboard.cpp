@@ -1,7 +1,7 @@
 #include "Dashboard.h"
-#include "QuanLyMonAn.h"
-#include "QuanLyNhanVien.h"
-#include "Utils.h"
+#include "services/QuanLyMonAn.h"
+#include "services/QuanLyNhanVien.h"
+#include "utils/Utils.h"
 #include <iostream>
 using namespace std;
 
