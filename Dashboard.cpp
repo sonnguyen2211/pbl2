@@ -1,6 +1,7 @@
 #include "Dashboard.h"
 #include "services/QuanLyMonAn.h"
 #include "services/QuanLyNhanVien.h"
+#include "services/QuanLyBanHang.h"
 #include "utils/Utils.h"
 #include <iostream>
 using namespace std;
@@ -14,7 +15,7 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
     while (true)
     {
         vector<string> dsMenu = {
-            "1. Bán hàng (đang phát triển)",
+            "1. Bán hàng",
             "2. Quản lý thực đơn",
             "3. Quản lý khách hàng (đang phát triển)",
             "4. Quản lý nhân viên",
@@ -31,9 +32,8 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
 
         if (muc.find("Bán hàng") != string::npos)
         {
-            xoaManHinh();
-            cout << "\nChức năng bán hàng đang được phát triển.\n";
-            dungManHinh();
+            QuanLyBanHang qlBanHang;
+            qlBanHang.hienThiMenu(nguoiDung);
         }
         else if (muc.find("Quản lý thực đơn") != string::npos)
         {
@@ -84,7 +84,7 @@ void Dashboard::menuThuNgan(const NguoiDung &nguoiDung)
     while (true)
     {
         vector<string> dsMenu = {
-            "1. Bán hàng (đang phát triển)",
+            "1. Bán hàng",
             "2. Xem thực đơn",
             "3. Quản lý khách hàng (đang phát triển)",
             "4. Xem hóa đơn (đang phát triển)",
@@ -98,9 +98,8 @@ void Dashboard::menuThuNgan(const NguoiDung &nguoiDung)
 
         if (muc.find("Bán hàng") != string::npos)
         {
-            xoaManHinh();
-            cout << "\nChức năng bán hàng đang được phát triển.\n";
-            dungManHinh();
+            QuanLyBanHang qlBanHang;
+            qlBanHang.hienThiMenu(nguoiDung);
         }
         else if (muc.find("Xem thực đơn") != string::npos)
         {

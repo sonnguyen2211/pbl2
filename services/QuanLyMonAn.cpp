@@ -215,6 +215,11 @@ void QuanLyMonAn::ghiFile() const
     f.close();
 }
 
+const vector<MonAn> &QuanLyMonAn::layDanhSachMonAn() const
+{
+    return danhSach;
+}
+
 // ============================================================
 // CAC HAM NHAP NGUYEN LIEU / THANH PHAN / TUY CHON (giu logic cu)
 // ============================================================

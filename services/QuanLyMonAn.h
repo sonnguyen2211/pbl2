@@ -108,6 +108,10 @@ public:
     void docFile();
     void ghiFile() const;
 
+    // Cung cap danh sach mon cho cac nghiep vu khac (ban hang, bao cao...)
+    // Du lieu chi doc, viec sua mon van phai thong qua QuanLyMonAn.
+    const vector<MonAn> &layDanhSachMonAn() const;
+
     void hienThiMenu(const NguoiDung &nguoiDung);
 };
 
