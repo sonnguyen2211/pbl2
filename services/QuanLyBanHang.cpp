@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <sstream>
 
 using namespace std;
@@ -171,14 +172,31 @@ string QuanLyBanHang::taoMaHoaDon() const
 
 void QuanLyBanHang::docFile()
 {
-    danhSachHoaDon.clear(); ifstream f(FILE_HOA_DON.c_str()); string dong;
-    while (getline(f, dong)) if (!dong.empty()) { HoaDon hd; hd.docTuDong(dong); danhSachHoaDon.push_back(hd); }
+    danhSachHoaDon.clear();
+    ifstream f(FILE_HOA_DON.c_str());
+    string dong;
+    while (getline(f, dong))
+    {
+        if (dong.empty()) continue;
+
+        HoaDon hd;
+        hd.docTuDong(dong);
+
+        // Không nạp các dòng lỗi/cũ không có mã hoặc chưa có món.
+        if (!hd.layMaHoaDon().empty() && !hd.rong())
+            danhSachHoaDon.push_back(hd);
+    }
 }
 
 void QuanLyBanHang::ghiFile() const
 {
     ofstream f(FILE_HOA_DON.c_str());
-    for (size_t i = 0; i < danhSachHoaDon.size(); ++i) f << danhSachHoaDon[i].chuyenThanhDong() << "\n";
+    for (size_t i = 0; i < danhSachHoaDon.size(); ++i)
+    {
+        // Đơn rỗng không hợp lệ, không ghi trở lại file dữ liệu.
+        if (!danhSachHoaDon[i].layMaHoaDon().empty() && !danhSachHoaDon[i].rong())
+            f << danhSachHoaDon[i].chuyenThanhDong() << "\n";
+    }
 }
 
 void QuanLyBanHang::hienThiDanhSach(int trangThai) const
@@ -242,9 +260,29 @@ void QuanLyBanHang::taoDonHang(const NguoiDung &nguoiDung)
         if (chon == (int)luaChon.size() - 1) break;
         vector<const MonAn*> monDangBan;
         for (size_t i = 0; i < dsMon.size(); ++i) if (dsMon[i].laConBan()) monDangBan.push_back(&dsMon[i]);
-        int soLuong; xoaManHinh(); cout << "\n  Số lượng " << monDangBan[chon]->layTenMon() << ": "; cin >> soLuong;
-        if (cin.fail() || soLuong <= 0) { cin.clear(); cin.ignore(10000, '\n'); cout << "  ⚠ Số lượng không hợp lệ.\n"; dungManHinh(); }
-        else don.themMon(*monDangBan[chon], soLuong);
+        int soLuong;
+        xoaManHinh();
+        cout << "\n  Số lượng " << monDangBan[chon]->layTenMon()
+             << " (nhập 0 để hủy chọn món): ";
+        cin >> soLuong;
+        if (cin.fail() || soLuong < 0)
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "  ⚠ Số lượng không hợp lệ.\n";
+            dungManHinh();
+        }
+        else if (soLuong == 0)
+        {
+            // Không thêm món; vòng lặp sẽ quay lại danh sách để chọn món khác.
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        else
+        {
+            don.themMon(*monDangBan[chon], soLuong);
+            // Bỏ ký tự Enter còn lại để menu mũi tên chờ thao tác tiếp theo.
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
     }
     if (don.rong()) { xoaManHinh(); cout << "\n  Đơn hàng chưa có món nên không được lưu.\n"; dungManHinh(); return; }
     danhSachHoaDon.push_back(don); ghiFile(); xoaManHinh(); cout << "\n  ✅ Đã tạo đơn hàng ở trạng thái đơn nháp.\n"; don.hienThiChiTiet(); dungManHinh();
@@ -279,12 +317,14 @@ void QuanLyBanHang::suaDonHang()
         if (cin.fail() || sl < 0)
         {
             cin.clear();
-            cin.ignore(10000, '\n');
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "  ⚠ Số lượng không hợp lệ.\n";
             dungManHinh();
             continue;
         }
         danhSachHoaDon[vt].suaSoLuong(maMon, sl);
+        // Tránh Enter của ô số lượng tự động chọn món đầu tiên ở vòng lặp kế tiếp.
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
     if (danhSachHoaDon[vt].rong()) danhSachHoaDon[vt].datTrangThai(DA_HUY);
     ghiFile(); xoaManHinh(); cout << "\n  ✅ Đã cập nhật đơn hàng.\n"; dungManHinh();
