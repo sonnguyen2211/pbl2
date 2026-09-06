@@ -72,6 +72,7 @@ private:
     void docFile();
     void ghiFile() const;
     void hienThiDanhSach(int trangThai = 0) const;
+    int chonDonNhap(const string &tieuDe) const;
     void suaDonHang();
     void huyDonHang();
     void thanhToanDonHang();

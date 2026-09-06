@@ -35,6 +35,20 @@ namespace
     {
         return chuyenThanhChuThuong(nguon).find(chuyenThanhChuThuong(tuKhoa)) != string::npos;
     }
+
+    string tomTatMon(const HoaDon &hoaDon)
+    {
+        const vector<ChiTietDonHang> &chiTiet = hoaDon.layChiTiet();
+        if (chiTiet.empty()) return "Chưa có món";
+
+        string ketQua;
+        for (size_t i = 0; i < chiTiet.size(); ++i)
+        {
+            if (i) ketQua += ", ";
+            ketQua += chiTiet[i].tenMon + " x" + to_string(chiTiet[i].soLuong);
+        }
+        return ketQua;
+    }
 }
 
 HoaDon::HoaDon() : tongTien(0), trangThai(DON_NHAP) {}
@@ -94,7 +108,7 @@ void HoaDon::tinhTongTien()
 
 void HoaDon::hienThiChiTiet() const
 {
-    cout << "\n  Mã hóa đơn: " << maHoaDon << "\n  Ngày tạo: " << ngayTao
+    cout << "\n  Ngày tạo: " << ngayTao
          << "\n  Nhân viên: " << tenNhanVien << "\n  Trạng thái: " << layTenTrangThai() << "\n";
     cout << "  ────────────────────────────────────────────────────\n";
     if (chiTiet.empty()) cout << "  (Chưa có món)\n";
@@ -175,12 +189,42 @@ void QuanLyBanHang::hienThiDanhSach(int trangThai) const
         if (trangThai == 0 || danhSachHoaDon[i].layTrangThai() == trangThai)
         {
             coDuLieu = true;
-            cout << "  " << danhSachHoaDon[i].layMaHoaDon() << " | " << danhSachHoaDon[i].layNgayTao()
-                 << " | " << danhSachHoaDon[i].layTenTrangThai() << " | " << fixed << setprecision(0)
+            cout << "  " << i + 1 << ". " << tomTatMon(danhSachHoaDon[i])
+                 << " | " << danhSachHoaDon[i].layNgayTao() << " | "
+                 << danhSachHoaDon[i].layTenTrangThai() << " | " << fixed << setprecision(0)
                  << danhSachHoaDon[i].layTongTien() << " VND\n";
         }
     if (!coDuLieu) cout << "  (Không có dữ liệu phù hợp)\n";
     cout << "  ════════════════════════════════════════════════════\n";
+}
+
+int QuanLyBanHang::chonDonNhap(const string &tieuDe) const
+{
+    vector<int> viTriDon;
+    vector<string> luaChon;
+
+    for (size_t i = 0; i < danhSachHoaDon.size(); ++i)
+    {
+        if (danhSachHoaDon[i].layTrangThai() != DON_NHAP) continue;
+
+        viTriDon.push_back((int)i);
+        luaChon.push_back("Đơn " + to_string(viTriDon.size()) + ": "
+                         + tomTatMon(danhSachHoaDon[i]) + " | "
+                         + to_string((long long)danhSachHoaDon[i].layTongTien()) + " VND");
+    }
+
+    if (luaChon.empty())
+    {
+        xoaManHinh();
+        cout << "\n  ⚠ Không có đơn nháp để thao tác.\n";
+        dungManHinh();
+        return -1;
+    }
+
+    luaChon.push_back("← Quay lại");
+    int chon = chonMenuMuiTen(tieuDe, luaChon);
+    if (chon == (int)luaChon.size() - 1) return -1;
+    return viTriDon[chon];
 }
 
 void QuanLyBanHang::taoDonHang(const NguoiDung &nguoiDung)
@@ -191,8 +235,8 @@ void QuanLyBanHang::taoDonHang(const NguoiDung &nguoiDung)
     {
         vector<string> luaChon;
         for (size_t i = 0; i < dsMon.size(); ++i)
-            if (dsMon[i].laConBan()) luaChon.push_back(dsMon[i].layMaMon() + " | " + dsMon[i].layTenMon() + " | " + to_string((long long)dsMon[i].layGia()) + " VND");
-        luaChon.push_back("0. Hoàn tất tạo đơn");
+            if (dsMon[i].laConBan()) luaChon.push_back(dsMon[i].layTenMon() + " | " + to_string((long long)dsMon[i].layGia()) + " VND");
+        luaChon.push_back("✓ Hoàn tất tạo đơn");
         if (luaChon.size() == 1) { xoaManHinh(); cout << "\n  ⚠ Không có món đang bán.\n"; dungManHinh(); return; }
         int chon = chonMenuMuiTen("TẠO ĐƠN HÀNG — CHỌN MÓN", luaChon);
         if (chon == (int)luaChon.size() - 1) break;
@@ -208,13 +252,39 @@ void QuanLyBanHang::taoDonHang(const NguoiDung &nguoiDung)
 
 void QuanLyBanHang::suaDonHang()
 {
-    xoaManHinh(); hienThiDanhSach(DON_NHAP); string ma; cout << "  Nhập mã đơn cần sửa: "; cin >> ma;
-    int vt = timViTriTheoMa(ma); if (vt < 0 || danhSachHoaDon[vt].layTrangThai() != DON_NHAP) { cout << "  ⚠ Không tìm thấy đơn nháp.\n"; dungManHinh(); return; }
+    int vt = chonDonNhap("✏️ SỬA ĐƠN HÀNG — CHỌN ĐƠN CẦN SỬA");
+    if (vt < 0) return;
+
     while (true)
     {
-        danhSachHoaDon[vt].hienThiChiTiet(); cout << "\n  Nhập mã món để sửa số lượng (0 để hoàn tất): "; cin >> ma;
-        if (ma == "0") break; int sl; cout << "  Số lượng mới (0 để xóa món): "; cin >> sl;
-        if (!danhSachHoaDon[vt].suaSoLuong(ma, sl)) cout << "  ⚠ Món không có trong đơn.\n";
+        const vector<ChiTietDonHang> &chiTiet = danhSachHoaDon[vt].layChiTiet();
+        if (chiTiet.empty()) break;
+
+        vector<string> luaChon;
+        for (size_t i = 0; i < chiTiet.size(); ++i)
+            luaChon.push_back(chiTiet[i].tenMon + " | SL: " + to_string(chiTiet[i].soLuong)
+                             + " | " + to_string((long long)chiTiet[i].thanhTien()) + " VND");
+        luaChon.push_back("✓ Hoàn tất chỉnh sửa");
+
+        int chon = chonMenuMuiTen("✏️ SỬA ĐƠN HÀNG — CHỌN MÓN", luaChon);
+        if (chon == (int)luaChon.size() - 1) break;
+
+        string maMon = chiTiet[chon].maMon;
+        string tenMon = chiTiet[chon].tenMon;
+        int sl;
+        xoaManHinh();
+        cout << "\n  Món đã chọn: " << tenMon << "\n";
+        cout << "  Nhập số lượng mới (0 để xóa món): ";
+        cin >> sl;
+        if (cin.fail() || sl < 0)
+        {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "  ⚠ Số lượng không hợp lệ.\n";
+            dungManHinh();
+            continue;
+        }
+        danhSachHoaDon[vt].suaSoLuong(maMon, sl);
     }
     if (danhSachHoaDon[vt].rong()) danhSachHoaDon[vt].datTrangThai(DA_HUY);
     ghiFile(); xoaManHinh(); cout << "\n  ✅ Đã cập nhật đơn hàng.\n"; dungManHinh();
@@ -222,15 +292,16 @@ void QuanLyBanHang::suaDonHang()
 
 void QuanLyBanHang::huyDonHang()
 {
-    xoaManHinh(); hienThiDanhSach(DON_NHAP); string ma; cout << "  Nhập mã đơn cần hủy: "; cin >> ma;
-    int vt = timViTriTheoMa(ma); if (vt < 0 || danhSachHoaDon[vt].layTrangThai() != DON_NHAP) { cout << "  ⚠ Không tìm thấy đơn nháp.\n"; dungManHinh(); return; }
+    int vt = chonDonNhap("🗑️ HỦY ĐƠN HÀNG — CHỌN ĐƠN CẦN HỦY");
+    if (vt < 0) return;
     danhSachHoaDon[vt].datTrangThai(DA_HUY); ghiFile(); cout << "  ✅ Đã hủy đơn hàng.\n"; dungManHinh();
 }
 
 void QuanLyBanHang::thanhToanDonHang()
 {
-    xoaManHinh(); hienThiDanhSach(DON_NHAP); string ma; cout << "  Nhập mã đơn cần thanh toán: "; cin >> ma;
-    int vt = timViTriTheoMa(ma); if (vt < 0 || danhSachHoaDon[vt].layTrangThai() != DON_NHAP || danhSachHoaDon[vt].rong()) { cout << "  ⚠ Đơn hàng không hợp lệ.\n"; dungManHinh(); return; }
+    int vt = chonDonNhap("💳 THANH TOÁN — CHỌN ĐƠN CẦN THANH TOÁN");
+    if (vt < 0) return;
+    if (danhSachHoaDon[vt].rong()) { cout << "  ⚠ Đơn hàng không hợp lệ.\n"; dungManHinh(); return; }
     danhSachHoaDon[vt].datTrangThai(DA_THANH_TOAN); ghiFile(); xoaManHinh(); cout << "\n  ✅ Thanh toán thành công.\n"; danhSachHoaDon[vt].hienThiChiTiet(); dungManHinh();
 }
 
@@ -238,8 +309,8 @@ void QuanLyBanHang::xemHoaDon() const { xoaManHinh(); cout << "\n  HÓA ĐƠN Đ
 
 void QuanLyBanHang::timKiemHoaDon() const
 {
-    xoaManHinh(); string tuKhoa; cout << "\n  Nhập mã hóa đơn hoặc tên nhân viên: "; cin.ignore(); getline(cin, tuKhoa);
-    bool co = false; for (size_t i = 0; i < danhSachHoaDon.size(); ++i) if (chuaTuKhoa(danhSachHoaDon[i].layMaHoaDon(), tuKhoa) || chuaTuKhoa(danhSachHoaDon[i].layTenNhanVien(), tuKhoa)) { danhSachHoaDon[i].hienThiChiTiet(); co = true; }
+    xoaManHinh(); string tuKhoa; cout << "\n  Nhập tên món hoặc tên nhân viên: "; getline(cin >> ws, tuKhoa);
+    bool co = false; for (size_t i = 0; i < danhSachHoaDon.size(); ++i) if (chuaTuKhoa(tomTatMon(danhSachHoaDon[i]), tuKhoa) || chuaTuKhoa(danhSachHoaDon[i].layTenNhanVien(), tuKhoa)) { danhSachHoaDon[i].hienThiChiTiet(); co = true; }
     if (!co) cout << "  Không tìm thấy hóa đơn phù hợp.\n"; dungManHinh();
 }
 
