@@ -143,17 +143,29 @@ NguoiDung QuanLyDangNhap::hienThiManHinhDangNhap() const
             cout << "\n✓ Đăng nhập thành công!\n";
             cout << "✓ Xin chào: " << nguoiDung.layHoTen() << endl;
             cout << "✓ Vai trò: " << nguoiDung.layTenVaiTro() << endl;
-            cout << "\nNhấn ENTER để tiếp tục...";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cin.get();
+
+            while (true)
+            {
+                int phim = docPhim();
+                if (phim == PHIM_ENTER)
+                    break;
+
+                cout << "\n  ⚠ Phím không hợp lệ. Vui lòng chỉ nhấn ENTER để vào menu quản lý.\n";
+            }
+
             break;
         }
         else
         {
             cout << "\n✗ Sai tên đăng nhập, mật khẩu, hoặc tài khoản không được phép đăng nhập!\n";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Nhấn ENTER để thử lại...";
-            cin.get();
+            while (true)
+            {
+                int phim = docPhim();
+                if (phim == PHIM_ENTER)
+                    break;
+
+                cout << "\n  ⚠ Phím không hợp lệ. Vui lòng chỉ nhấn ENTER để thử lại.\n";
+            }
         }
     }
 
