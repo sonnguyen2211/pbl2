@@ -11,7 +11,7 @@ string chuyenThanhChuThuong(const string &s);
 
 void xoaManHinh();
 void xoaManHinhMuot();
-void dungManHinh();
+void dungManHinh(const string &thongBao = "  Nhấn ENTER để tiếp tục...");
 
 void veKhungTieuDe(const string &tieuDe, int doRong = 44);
 void veDuongKe(int doRong = 44);

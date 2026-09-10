@@ -65,11 +65,17 @@ void xoaManHinh()
 #endif
 }
 
-void dungManHinh()
+void dungManHinh(const string &thongBao)
 {
-    cout << "\n  Nhấn ENTER để tiếp tục...";
-    cin.ignore();
-    cin.get();
+    while (true)
+    {
+        cout << "\n" << thongBao << flush;
+        int phim = docPhim();
+        if (phim == PHIM_ENTER)
+            return;
+
+        cout << "\n  ⚠ Phím không hợp lệ. Vui lòng chỉ nhấn ENTER để quay lại.\n";
+    }
 }
 
 void veDuongKe(int doRong)
