@@ -598,37 +598,35 @@ void QuanLyNhanVien::quanLyTaiKhoan()
 
 void QuanLyNhanVien::hienThiMenu()
 {
-    int luaChon;
-    do
+    vector<string> dsMenu = {
+        "1. ➕ Thêm nhân viên",
+        "2. ✏️ Sửa nhân viên",
+        "4. 🔍 Tìm kiếm nhân viên",
+        "5. 📋 Xem danh sách nhân viên",
+        "8. 🔐 Quản lý tài khoản đăng nhập",
+        "0. ⬅️ Quay lại"
+    };
+
+    while (true)
     {
-        xoaManHinh();
-        cout << "\n  ═══════════════════════════════════════════════\n";
-        cout << "  👥 QUẢN LÝ NHÂN VIÊN\n";
-        cout << "  ═══════════════════════════════════════════════\n\n";
-        cout << "    1. ➕ Thêm nhân viên\n";
-        cout << "    2. ✏️ Sửa nhân viên\n";
-        cout << "    4. 🔍 Tìm kiếm nhân viên\n";
-        cout << "    5. 📋 Xem danh sách nhân viên\n";
-        cout << "    8. 🔐 Quản lý tài khoản đăng nhập\n";
-        cout << "    0. ⬅️ Quay lại\n";
-        cout << "  ═══════════════════════════════════════════════\n";
-        cout << "  Chọn: ";
-        cin >> luaChon;
+        int luaChon = chonMenuMuiTen("👥 QUẢN LÝ NHÂN VIÊN", dsMenu);
 
         switch (luaChon)
         {
-        case 1: themNhanVien(); break;
-        case 2: suaNhanVien(); break;
-        case 4: timKiemNhanVien(); break;
-        case 5: xemDanhSach(); break;
-        case 8: quanLyTaiKhoan(); break;
-        case 0:
+        case 0: themNhanVien(); break;
+        case 1: suaNhanVien(); break;
+        case 2: timKiemNhanVien(); break;
+        case 3: xemDanhSach(); break;
+        case 4: quanLyTaiKhoan(); break;
+        case 5:
+            xoaManHinh();
             cout << "\n  ⬅️ Quay lại...\n";
             dungManHinh();
-            break;
+            return;
         default:
+            xoaManHinh();
             cout << "\n  ❌ Lựa chọn không hợp lệ!\n";
             dungManHinh();
         }
-    } while (luaChon != 0);
+    }
 }
