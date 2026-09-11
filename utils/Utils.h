@@ -15,6 +15,7 @@ void dungManHinh(const string &thongBao = "  Nhấn ENTER để tiếp tục..."
 
 void veKhungTieuDe(const string &tieuDe, int doRong = 44);
 void veDuongKe(int doRong = 44);
+void xoaBoNhoDemBanPhim();
 
 enum PhimDieuHuong
 {

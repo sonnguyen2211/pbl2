@@ -103,19 +103,42 @@ void veKhungTieuDe(const string &tieuDe, int doRong)
     cout << "  ╚" << ngang << "╝\n";
 }
 
+void xoaBoNhoDemBanPhim()
+{
+#ifdef _WIN32
+    while (_kbhit())
+        _getch();
+#else
+    tcflush(STDIN_FILENO, TCIFLUSH);
+#endif
+}
+
 #ifndef _WIN32
-static int getch_unix()
+static int getch_unix(bool nonBlocking = false)
 {
     struct termios oldSettings, newSettings;
-    tcgetattr(STDIN_FILENO, &oldSettings);
+    if (tcgetattr(STDIN_FILENO, &oldSettings) != 0)
+        return getchar();
+
     newSettings = oldSettings;
     newSettings.c_lflag &= ~(ICANON | ECHO);
+    if (nonBlocking)
+    {
+        newSettings.c_cc[VMIN] = 0;
+        newSettings.c_cc[VTIME] = 1; // 100ms
+    }
+    else
+    {
+        newSettings.c_cc[VMIN] = 1;
+        newSettings.c_cc[VTIME] = 0;
+    }
     tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
 
-    int ch = getchar();
+    unsigned char ch = 0;
+    ssize_t n = read(STDIN_FILENO, &ch, 1);
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);
-    return ch;
+    return (n > 0) ? (int)ch : -1;
 }
 #endif
 
@@ -140,14 +163,15 @@ int docPhim()
     return c;
 
 #else
-    int c = getch_unix();
+    int c = getch_unix(false);
+    if (c == -1) return PHIM_KHAC;
 
     if (c == 27)
     {
-        int c2 = getch_unix();
-        if (c2 == '[')
+        int c2 = getch_unix(true);
+        if (c2 == '[' || c2 == 'O')
         {
-            int c3 = getch_unix();
+            int c3 = getch_unix(true);
             switch (c3)
             {
                 case 'A': return PHIM_LEN;
@@ -155,7 +179,11 @@ int docPhim()
                 default: return PHIM_KHAC;
             }
         }
-        return PHIM_ESC;
+        else if (c2 == -1)
+        {
+            return PHIM_ESC;
+        }
+        return PHIM_KHAC;
     }
 
     if (c == 10 || c == 13) return PHIM_ENTER;
@@ -175,6 +203,9 @@ int chonMenuMuiTen(const string &tieuDe, const vector<string> &cacLuaChon,
 
     // Xóa sạch màn hình đúng 1 lần khi mở Menu
     xoaManHinh();
+
+    // Xóa bộ đệm bàn phím đọng lại trước khi đón nhận thao tác menu
+    xoaBoNhoDemBanPhim();
 
     while (true)
     {

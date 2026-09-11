@@ -144,13 +144,14 @@ NguoiDung QuanLyDangNhap::hienThiManHinhDangNhap() const
             cout << "✓ Xin chào: " << nguoiDung.layHoTen() << endl;
             cout << "✓ Vai trò: " << nguoiDung.layTenVaiTro() << endl;
 
+            cout << "\nNhấn ENTER để tiếp tục..." << flush;
             while (true)
             {
                 int phim = docPhim();
                 if (phim == PHIM_ENTER)
                     break;
 
-                cout << "\n  ⚠ Phím không hợp lệ. Vui lòng chỉ nhấn ENTER để vào menu quản lý.\n";
+                cout << "\n  ⚠ Phím không hợp lệ. Vui lòng chỉ nhấn ENTER để vào menu quản lý." << flush;
             }
 
             break;
@@ -158,13 +159,14 @@ NguoiDung QuanLyDangNhap::hienThiManHinhDangNhap() const
         else
         {
             cout << "\n✗ Sai tên đăng nhập, mật khẩu, hoặc tài khoản không được phép đăng nhập!\n";
+            cout << "\nNhấn ENTER để tiếp tục..." << flush;
             while (true)
             {
                 int phim = docPhim();
                 if (phim == PHIM_ENTER)
                     break;
 
-                cout << "\n  ⚠ Phím không hợp lệ. Vui lòng chỉ nhấn ENTER để thử lại.\n";
+                cout << "\n  ⚠ Phím không hợp lệ. Vui lòng chỉ nhấn ENTER để thử lại." << flush;
             }
         }
     }

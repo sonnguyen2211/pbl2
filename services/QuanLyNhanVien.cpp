@@ -211,36 +211,38 @@ void QuanLyNhanVien::themNhanVien()
     } while (!maHopLe);
 
     string hoTen, sdt;
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "  Họ và tên: ";
     getline(cin, hoTen);
     cout << "  Số điện thoại: ";
     getline(cin, sdt);
 
-    cout << "\n  Vai trò:\n";
-    cout << "    1. Quản lý\n";
-    cout << "    2. Thu ngân\n";
-    cout << "    3. Phục vụ\n";
-    cout << "  Chọn: ";
-    int vt;
-    cin >> vt;
-    while (vt < 1 || vt > 3)
-    {
-        cout << "  Lựa chọn không hợp lệ, nhập lại: ";
-        cin >> vt;
-    }
+    vector<string> dsVaiTro = {
+        "1. Quản lý",
+        "2. Thu ngân",
+        "3. Phục vụ"
+    };
+    int vt = chonMenuMuiTen("💼 CHỌN VAI TRÒ", dsVaiTro);
+    VaiTro vaiTroChon = (VaiTro)(vt + 1);
 
-    cout << "\n  Cho phép đăng nhập hệ thống? (1: Có, 0: Không): ";
-    int choPhep;
-    cin >> choPhep;
+    vector<string> dsChoPhep = {
+        "1. Có (Được phép đăng nhập)",
+        "0. Không (Không đăng nhập)"
+    };
+    int cp = chonMenuMuiTen("🔐 CHO PHÉP ĐĂNG NHẬP HỆ THỐNG?", dsChoPhep);
+    bool choPhep = (cp == 0);
 
     string tenDangNhap = "", matKhau = "";
-    if (choPhep == 1)
+    if (choPhep)
     {
         do
         {
+            xoaManHinh();
+            cout << "\n  ═══════════════════════════════════════════════\n";
+            cout << "  🔐 THIẾT LẬP TÀI KHOẢN ĐĂNG NHẬP\n";
+            cout << "  ═══════════════════════════════════════════════\n";
             cout << "  Tên đăng nhập (mặc định = mã NV, Enter để dùng mặc định): ";
-            cin.ignore();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             getline(cin, tenDangNhap);
             if (tenDangNhap.empty())
                 tenDangNhap = ma;
@@ -248,6 +250,7 @@ void QuanLyNhanVien::themNhanVien()
             if (kiemTraTenDangNhapTonTai(tenDangNhap))
             {
                 cout << "  ❌ Tên đăng nhập đã tồn tại, chọn tên khác!\n";
+                dungManHinh();
                 tenDangNhap = "";
             }
         } while (tenDangNhap.empty());
@@ -256,19 +259,27 @@ void QuanLyNhanVien::themNhanVien()
         cin >> matKhau;
     }
 
-    NhanVien nvMoi(ma, tenDangNhap, matKhau, hoTen, sdt, (VaiTro)vt, choPhep == 1);
+    NhanVien nvMoi(ma, tenDangNhap, matKhau, hoTen, sdt, vaiTroChon, choPhep);
 
-    xoaManHinh();
-    cout << "\n  ═══════════════════════════════════════════════\n";
-    cout << "  📋 XÁC NHẬN THÔNG TIN NHÂN VIÊN\n";
-    cout << "  ═══════════════════════════════════════════════\n\n";
-    nvMoi.hienThi();
-    cout << "  ═══════════════════════════════════════════════\n";
+    ostringstream ossXN;
+    ossXN << "\n  ═══════════════════════════════════════════════\n";
+    ossXN << "  📋 XÁC NHẬN THÔNG TIN NHÂN VIÊN\n";
+    ossXN << "  ═══════════════════════════════════════════════\n\n";
+    ossXN << "  Mã NV: " << nvMoi.layMaNhanVien() << "\n";
+    ossXN << "  Họ tên: " << nvMoi.layHoTen() << "\n";
+    ossXN << "  SĐT: " << nvMoi.laySoDienThoai() << "\n";
+    ossXN << "  Vai trò: " << nvMoi.layTenVaiTro() << "\n";
+    ossXN << "  Trạng thái: " << nvMoi.layTenTrangThai() << "\n";
+    ossXN << "  Tài khoản đăng nhập: " << nvMoi.layTenDangNhap()
+          << (nvMoi.laDuocPhepDangNhap() ? " (được phép đăng nhập)" : " (không được phép đăng nhập)") << "\n";
+    ossXN << "  ─────────────────────────────────────────────\n\n";
 
-    cout << "\n  Lưu nhân viên? (1: Có, 0: Không): ";
-    int xn;
-    cin >> xn;
-    if (xn == 1)
+    vector<string> dsLuu = {
+        "1. ✅ Lưu nhân viên",
+        "0. ❌ Hủy"
+    };
+    int xn = chonMenuMuiTen("BẠN CÓ MUỐN LƯU NHÂN VIÊN NÀY KHÔNG?", dsLuu, 0, false, ossXN.str());
+    if (xn == 0)
     {
         danhSach.push_back(nvMoi);
         ghiFile();
@@ -299,6 +310,7 @@ void QuanLyNhanVien::suaNhanVien()
     cout << "  ═══════════════════════════════════════════════\n";
     cout << "  Nhập mã nhân viên cần sửa: ";
     cin >> ma;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     int viTri = timViTriTheoMa(ma);
     if (viTri == -1)
@@ -309,72 +321,107 @@ void QuanLyNhanVien::suaNhanVien()
         return;
     }
 
-    xoaManHinh();
-    cout << "\n  📋 Thông tin hiện tại:\n";
-    cout << "  ─────────────────────────────────────────────\n";
-    danhSach[viTri].hienThi();
-    cout << "  ─────────────────────────────────────────────\n";
+    vector<string> dsSua = {
+        "1. Sửa họ tên",
+        "2. Sửa số điện thoại",
+        "3. Sửa vai trò",
+        "4. Đổi mật khẩu",
+        "5. Bật/tắt quyền đăng nhập",
+        "0. Hoàn tất"
+    };
 
-    int luaChon;
-    do
+    bool tiepTuc = true;
+    while (tiepTuc)
     {
-        cout << "\n  Chọn thông tin cần sửa:\n";
-        cout << "    1. Sửa họ tên\n";
-        cout << "    2. Sửa số điện thoại\n";
-        cout << "    3. Sửa vai trò\n";
-        cout << "    4. Đổi mật khẩu\n";
-        cout << "    5. Bật/tắt quyền đăng nhập\n";
-        cout << "    0. Hoàn tất\n";
-        cout << "  Chọn: ";
-        cin >> luaChon;
+        ostringstream oss;
+        oss << "\n  ═══════════════════════════════════════════════\n";
+        oss << "  ✏️ SỬA NHÂN VIÊN\n";
+        oss << "  ═══════════════════════════════════════════════\n\n";
+        oss << "  📋 Thông tin hiện tại:\n";
+        oss << "  ─────────────────────────────────────────────\n";
+        oss << "  Mã NV: " << danhSach[viTri].layMaNhanVien() << "\n";
+        oss << "  Họ tên: " << danhSach[viTri].layHoTen() << "\n";
+        oss << "  SĐT: " << danhSach[viTri].laySoDienThoai() << "\n";
+        oss << "  Vai trò: " << danhSach[viTri].layTenVaiTro() << "\n";
+        oss << "  Trạng thái: " << danhSach[viTri].layTenTrangThai() << "\n";
+        oss << "  Tài khoản đăng nhập: " << (danhSach[viTri].layTenDangNhap().empty() ? "(chưa có)" : danhSach[viTri].layTenDangNhap())
+            << (danhSach[viTri].laDuocPhepDangNhap() ? " (được phép đăng nhập)" : " (không được phép đăng nhập)") << "\n";
+        if (danhSach[viTri].laDuocPhepDangNhap())
+            oss << "  Khóa tài khoản: " << (danhSach[viTri].laDangBiKhoa() ? "Đang khóa" : "Không khóa") << "\n";
+        oss << "  ─────────────────────────────────────────────\n\n";
 
-        switch (luaChon)
+        int viTriChon = chonMenuMuiTen("Chọn thông tin cần sửa:", dsSua, 0, false, oss.str());
+
+        switch (viTriChon)
         {
-        case 1:
+        case 0: // Sửa họ tên
         {
+            xoaManHinh();
             string ten;
-            cin.ignore();
-            cout << "  Họ tên mới: ";
+            cout << "\n  ═══════════════════════════════════════════════\n";
+            cout << "  👤 SỬA HỌ TÊN NHÂN VIÊN\n";
+            cout << "  ═══════════════════════════════════════════════\n";
+            cout << "  Họ tên hiện tại: " << danhSach[viTri].layHoTen() << "\n";
+            cout << "  Nhập họ tên mới: ";
             getline(cin, ten);
-            danhSach[viTri].doiHoTen(ten);
-            xoaManHinh();
-            cout << "\n  ✅ Đã cập nhật họ tên!\n";
-            dungManHinh();
-            break;
-        }
-        case 2:
-        {
-            string sdt;
-            cin.ignore();
-            cout << "  Số điện thoại mới: ";
-            getline(cin, sdt);
-            danhSach[viTri].datSoDienThoai(sdt);
-            xoaManHinh();
-            cout << "\n  ✅ Đã cập nhật số điện thoại!\n";
-            dungManHinh();
-            break;
-        }
-        case 3:
-        {
-            cout << "    1. Quản lý\n    2. Thu ngân\n    3. Phục vụ\n  Chọn: ";
-            int vt;
-            cin >> vt;
-            if (vt >= 1 && vt <= 3)
+            if (!ten.empty())
             {
-                danhSach[viTri].doiVaiTro((VaiTro)vt);
+                danhSach[viTri].doiHoTen(ten);
                 xoaManHinh();
-                cout << "\n  ✅ Đã cập nhật vai trò: " << danhSach[viTri].layTenVaiTro() << endl;
-                dungManHinh();
+                cout << "\n  ✅ Đã cập nhật họ tên!\n";
             }
             else
             {
-                cout << "  ❌ Lựa chọn không hợp lệ!\n";
+                xoaManHinh();
+                cout << "\n  ⚠ Không thay đổi họ tên.\n";
+            }
+            dungManHinh();
+            break;
+        }
+        case 1: // Sửa số điện thoại
+        {
+            xoaManHinh();
+            string sdtMoi;
+            cout << "\n  ═══════════════════════════════════════════════\n";
+            cout << "  📞 SỬA SỐ ĐIỆN THOẠI NHÂN VIÊN\n";
+            cout << "  ═══════════════════════════════════════════════\n";
+            cout << "  SĐT hiện tại: " << danhSach[viTri].laySoDienThoai() << "\n";
+            cout << "  Nhập số điện thoại mới: ";
+            getline(cin, sdtMoi);
+            if (!sdtMoi.empty())
+            {
+                danhSach[viTri].datSoDienThoai(sdtMoi);
+                xoaManHinh();
+                cout << "\n  ✅ Đã cập nhật số điện thoại!\n";
+            }
+            else
+            {
+                xoaManHinh();
+                cout << "\n  ⚠ Không thay đổi số điện thoại.\n";
+            }
+            dungManHinh();
+            break;
+        }
+        case 2: // Sửa vai trò
+        {
+            vector<string> dsVaiTro = {
+                "1. Quản lý",
+                "2. Thu ngân",
+                "3. Phục vụ"
+            };
+            int vt = chonMenuMuiTen("💼 CHỌN VAI TRÒ MỚI", dsVaiTro, (int)danhSach[viTri].layVaiTro() - 1);
+            if (vt >= 0 && vt <= 2)
+            {
+                danhSach[viTri].doiVaiTro((VaiTro)(vt + 1));
+                xoaManHinh();
+                cout << "\n  ✅ Đã cập nhật vai trò thành: " << danhSach[viTri].layTenVaiTro() << "\n";
                 dungManHinh();
             }
             break;
         }
-        case 4:
+        case 3: // Đổi mật khẩu
         {
+            xoaManHinh();
             if (!danhSach[viTri].laDuocPhepDangNhap())
             {
                 cout << "\n  ⚠ Nhân viên này chưa được cấp quyền đăng nhập.\n";
@@ -382,31 +429,33 @@ void QuanLyNhanVien::suaNhanVien()
                 break;
             }
             string mkMoi;
-            cout << "  Mật khẩu mới: ";
+            cout << "\n  ═══════════════════════════════════════════════\n";
+            cout << "  🔑 ĐỔI MẬT KHẨU CHO NHÂN VIÊN: " << danhSach[viTri].layHoTen() << "\n";
+            cout << "  ═══════════════════════════════════════════════\n";
+            cout << "  Nhập mật khẩu mới: ";
             cin >> mkMoi;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             danhSach[viTri].doiMatKhau(mkMoi);
             xoaManHinh();
             cout << "\n  ✅ Đã đổi mật khẩu!\n";
             dungManHinh();
             break;
         }
-        case 5:
+        case 4: // Bật/tắt quyền đăng nhập
         {
             bool trangThaiMoi = !danhSach[viTri].laDuocPhepDangNhap();
             danhSach[viTri].datChoPhepDangNhap(trangThaiMoi);
             xoaManHinh();
             cout << "\n  ✅ Quyền đăng nhập hiện tại: "
-                 << (trangThaiMoi ? "Được phép" : "Không được phép") << endl;
+                 << (trangThaiMoi ? "Được phép đăng nhập" : "Không được phép đăng nhập") << "\n";
             dungManHinh();
             break;
         }
-        case 0:
+        case 5: // Hoàn tất (0. Hoàn tất)
+            tiepTuc = false;
             break;
-        default:
-            cout << "  ❌ Lựa chọn không hợp lệ!\n";
-            dungManHinh();
         }
-    } while (luaChon != 0);
+    }
 
     ghiFile();
     xoaManHinh();
@@ -425,7 +474,7 @@ void QuanLyNhanVien::timKiemNhanVien() const
     }
 
     string tuKhoa;
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "\n  ═══════════════════════════════════════════════\n";
     cout << "  🔍 TÌM KIẾM NHÂN VIÊN\n";
     cout << "  ═══════════════════════════════════════════════\n";
@@ -521,6 +570,7 @@ void QuanLyNhanVien::quanLyTaiKhoan()
     cout << "  ═══════════════════════════════════════════════\n";
     cout << "  Nhập mã nhân viên: ";
     cin >> ma;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     int viTri = timViTriTheoMa(ma);
     if (viTri == -1)
@@ -531,31 +581,34 @@ void QuanLyNhanVien::quanLyTaiKhoan()
         return;
     }
 
-    int luaChon;
-    do
-    {
-        xoaManHinh();
-        cout << "\n  ═══════════════════════════════════════════════\n";
-        cout << "  🔐 TÀI KHOẢN — " << danhSach[viTri].layMaNhanVien()
-             << " | " << danhSach[viTri].layHoTen() << "\n";
-        cout << "  ═══════════════════════════════════════════════\n";
-        cout << "  Tên đăng nhập: " << (danhSach[viTri].layTenDangNhap().empty()
-                ? "(chưa có)" : danhSach[viTri].layTenDangNhap()) << "\n";
-        cout << "  Cho phép đăng nhập: " << (danhSach[viTri].laDuocPhepDangNhap() ? "Có" : "Không") << "\n";
-        cout << "  Trạng thái khóa: " << (danhSach[viTri].laDangBiKhoa() ? "Đang khóa" : "Không khóa") << "\n\n";
+    vector<string> dsMenuTK = {
+        "1. Đổi mật khẩu",
+        "2. Khóa tài khoản",
+        "3. Mở khóa tài khoản",
+        "4. Không cho phép đăng nhập",
+        "0. Quay lại"
+    };
 
-        cout << "    1. Đổi mật khẩu\n";
-        cout << "    2. Khóa tài khoản\n";
-        cout << "    3. Mở khóa tài khoản\n";
-        cout << "    4. Không cho phép đăng nhập\n";
-        cout << "    0. Quay lại\n";
-        cout << "  Chọn: ";
-        cin >> luaChon;
+    bool tiepTuc = true;
+    while (tiepTuc)
+    {
+        ostringstream oss;
+        oss << "\n  ═══════════════════════════════════════════════\n";
+        oss << "  🔐 TÀI KHOẢN — " << danhSach[viTri].layMaNhanVien()
+            << " | " << danhSach[viTri].layHoTen() << "\n";
+        oss << "  ═══════════════════════════════════════════════\n";
+        oss << "  Tên đăng nhập: " << (danhSach[viTri].layTenDangNhap().empty()
+                ? "(chưa có)" : danhSach[viTri].layTenDangNhap()) << "\n";
+        oss << "  Cho phép đăng nhập: " << (danhSach[viTri].laDuocPhepDangNhap() ? "Có" : "Không") << "\n";
+        oss << "  Trạng thái khóa: " << (danhSach[viTri].laDangBiKhoa() ? "Đang khóa" : "Không khóa") << "\n\n";
+
+        int luaChon = chonMenuMuiTen("", dsMenuTK, 0, false, oss.str());
 
         switch (luaChon)
         {
-        case 1:
+        case 0: // Đổi mật khẩu
         {
+            xoaManHinh();
             if (!danhSach[viTri].laDuocPhepDangNhap())
             {
                 cout << "\n  ⚠ Nhân viên chưa có quyền đăng nhập.\n";
@@ -563,35 +616,41 @@ void QuanLyNhanVien::quanLyTaiKhoan()
                 break;
             }
             string mkMoi;
-            cout << "  Mật khẩu mới: ";
+            cout << "\n  ═══════════════════════════════════════════════\n";
+            cout << "  🔑 ĐỔI MẬT KHẨU TÀI KHOẢN\n";
+            cout << "  ═══════════════════════════════════════════════\n";
+            cout << "  Nhập mật khẩu mới: ";
             cin >> mkMoi;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             danhSach[viTri].doiMatKhau(mkMoi);
+            xoaManHinh();
             cout << "\n  ✅ Đã đổi mật khẩu!\n";
             dungManHinh();
             break;
         }
-        case 2:
+        case 1: // Khóa tài khoản
             danhSach[viTri].datTaiKhoanBiKhoa(true);
+            xoaManHinh();
             cout << "\n  ✅ Đã khóa tài khoản!\n";
             dungManHinh();
             break;
-        case 3:
+        case 2: // Mở khóa tài khoản
             danhSach[viTri].datTaiKhoanBiKhoa(false);
+            xoaManHinh();
             cout << "\n  ✅ Đã mở khóa tài khoản!\n";
             dungManHinh();
             break;
-        case 4:
+        case 3: // Không cho phép đăng nhập
             danhSach[viTri].datChoPhepDangNhap(false);
+            xoaManHinh();
             cout << "\n  ✅ Đã tắt quyền đăng nhập!\n";
             dungManHinh();
             break;
-        case 0:
+        case 4: // Quay lại
+            tiepTuc = false;
             break;
-        default:
-            cout << "\n  ❌ Lựa chọn không hợp lệ!\n";
-            dungManHinh();
         }
-    } while (luaChon != 0);
+    }
 
     ghiFile();
 }
