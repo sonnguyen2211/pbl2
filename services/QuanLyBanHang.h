@@ -37,6 +37,7 @@ private:
 
 public:
     HoaDon();
+    virtual ~HoaDon() {} // destructor ao: cho phep ke thua da hinh an toan (VD: DonHangOnline)
 
     string layMaHoaDon() const;
     string layNgayTao() const;
@@ -51,11 +52,14 @@ public:
     void datTenNhanVien(const string &ten);
     void datTrangThai(int trangThaiMoi);
     void themMon(const MonAn &mon, int soLuong);
+    // Them 1 dong chi tiet da co san (dung khi chuyen du lieu tu gio hang sang don online,
+    // luc nay khong co san doi tuong MonAn ma chi co ChiTietDonHang da tinh san)
+    void themChiTietTrucTiep(const ChiTietDonHang &ct);
     bool suaSoLuong(const string &maMon, int soLuongMoi);
     bool xoaMon(const string &maMon);
     bool rong() const;
     void tinhTongTien();
-    void hienThiChiTiet() const;
+    virtual void hienThiChiTiet() const; // ao: cho phep DonHangOnline ghi de hien thi rieng
 
     string chuyenThanhDong() const;
     void docTuDong(const string &dong);

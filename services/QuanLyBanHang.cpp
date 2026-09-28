@@ -86,6 +86,19 @@ void HoaDon::themMon(const MonAn &mon, int soLuong)
     tinhTongTien();
 }
 
+void HoaDon::themChiTietTrucTiep(const ChiTietDonHang &ct)
+{
+    for (size_t i = 0; i < chiTiet.size(); ++i)
+        if (chiTiet[i].maMon == ct.maMon)
+        {
+            chiTiet[i].soLuong += ct.soLuong;
+            tinhTongTien();
+            return;
+        }
+    chiTiet.push_back(ct);
+    tinhTongTien();
+}
+
 bool HoaDon::suaSoLuong(const string &maMon, int soLuongMoi)
 {
     for (size_t i = 0; i < chiTiet.size(); ++i)
