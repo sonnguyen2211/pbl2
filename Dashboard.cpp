@@ -2,10 +2,11 @@
 #include "services/QuanLyMonAn.h"
 #include "services/QuanLyNhanVien.h"
 #include "services/QuanLyBanHang.h"
-#include "services/QuanLyKhachHang.h"
-#include "services/QuanLyGioHang.h"
-#include "services/QuanLyDonHangOnline.h"
-#include "services/QuanLyDanhGia.h"
+#include "services/QuanLyTaiChinh.h"
+#include "services/Quanlykhachhang.h"
+#include "services/Quanlygiohang.h"
+#include "services/Quanlydonhangonline.h"
+#include "services/Quanlydanhgia.h"
 #include "utils/Utils.h"
 #include <iostream>
 using namespace std;
@@ -23,9 +24,7 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
             "2. Quản lý thực đơn",
             "3. Quản lý khách hàng (đang phát triển)",
             "4. Quản lý nhân viên",
-            "5. Quản lý kho (đang phát triển)",
-            "6. Quản lý thu - chi (đang phát triển)",
-            "7. Thống kê & báo cáo (đang phát triển)",
+            "6. Quản lý tài chính & Báo cáo",
             "0. Đăng xuất"
         };
 
@@ -55,23 +54,10 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
             QuanLyNhanVien qlNhanVien;
             qlNhanVien.hienThiMenu();
         }
-        else if (muc.find("Quản lý kho") != string::npos)
+        else if (muc.find("Quản lý tài chính") != string::npos)
         {
-            xoaManHinh();
-            cout << "\nChức năng quản lý kho đang được phát triển.\n";
-            dungManHinh();
-        }
-        else if (muc.find("thu - chi") != string::npos)
-        {
-            xoaManHinh();
-            cout << "\nChức năng quản lý thu - chi đang được phát triển.\n";
-            dungManHinh();
-        }
-        else if (muc.find("Thống kê") != string::npos)
-        {
-            xoaManHinh();
-            cout << "\nChức năng thống kê & báo cáo đang được phát triển.\n";
-            dungManHinh();
+            QuanLyTaiChinh qlTaiChinh;
+            qlTaiChinh.hienThiMenu();
         }
         else if (muc.find("Đăng xuất") != string::npos)
         {

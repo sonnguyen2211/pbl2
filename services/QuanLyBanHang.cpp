@@ -1,4 +1,5 @@
 #include "QuanLyBanHang.h"
+#include "QuanLyTaiChinh.h"
 #include "../utils/Utils.h"
 #include <algorithm>
 #include <ctime>
@@ -355,7 +356,13 @@ void QuanLyBanHang::thanhToanDonHang()
     int vt = chonDonNhap("💳 THANH TOÁN — CHỌN ĐƠN CẦN THANH TOÁN");
     if (vt < 0) return;
     if (danhSachHoaDon[vt].rong()) { cout << "  ⚠ Đơn hàng không hợp lệ.\n"; dungManHinh(); return; }
-    danhSachHoaDon[vt].datTrangThai(DA_THANH_TOAN); ghiFile(); xoaManHinh(); cout << "\n  ✅ Thanh toán thành công.\n"; danhSachHoaDon[vt].hienThiChiTiet(); dungManHinh();
+    danhSachHoaDon[vt].datTrangThai(DA_THANH_TOAN); ghiFile();
+    string ngay = danhSachHoaDon[vt].layNgayTao();
+    // Hóa đơn cũ lưu ngày dd/mm/YYYY; giao dịch tài chính chuẩn hóa thành YYYY-MM-DD.
+    if (ngay.size() >= 10 && ngay[2] == '/' && ngay[5] == '/')
+        ngay = ngay.substr(6, 4) + "-" + ngay.substr(3, 2) + "-" + ngay.substr(0, 2);
+    QuanLyTaiChinh().ghiNhanDoanhThu(danhSachHoaDon[vt].layMaHoaDon(), danhSachHoaDon[vt].layTongTien(), ngay);
+    xoaManHinh(); cout << "\n  ✅ Thanh toán thành công.\n"; danhSachHoaDon[vt].hienThiChiTiet(); dungManHinh();
 }
 
 void QuanLyBanHang::xemHoaDon() const { xoaManHinh(); cout << "\n  HÓA ĐƠN ĐÃ THANH TOÁN\n"; hienThiDanhSach(DA_THANH_TOAN); dungManHinh(); }
