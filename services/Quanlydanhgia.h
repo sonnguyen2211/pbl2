@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "QuanLyKhachHang.h"
+#include "Quanlykhachhang.h"
 
 using namespace std;
 

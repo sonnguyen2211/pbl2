@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "QuanLyBanHang.h" // HoaDon, ChiTietDonHang (tai su dung)
-#include "QuanLyKhachHang.h"
+#include "Quanlykhachhang.h"
 
 using namespace std;
 

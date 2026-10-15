@@ -1,5 +1,5 @@
 #include "Quanlytaikhoan.h"
-#include "QuanLyKhachHang.h" // FILE_KHACH_HANG + luong dang ky khach hang moi
+#include "Quanlykhachhang.h" // FILE_KHACH_HANG + luong dang ky khach hang moi
 #include "../utils/Utils.h"
 #include <iostream>
 #include <fstream>
@@ -212,9 +212,9 @@ NguoiDung QuanLyDangNhap::hienThiManHinhDangNhap(bool &daChonThoat) const
 
         string tenDangNhap, matKhau;
         cout << "Tên đăng nhập: ";
-        cin >> tenDangNhap;
+        getline(cin, tenDangNhap);
         cout << "Mật khẩu: ";
-        cin >> matKhau;
+        getline(cin, matKhau);
 
         cout << "\nĐang xác thực...\n";
 

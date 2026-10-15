@@ -2,7 +2,7 @@
 #define DASHBOARD_H
 
 #include "services/Quanlytaikhoan.h" // can NguoiDung de truyen xuong cac menu con
-#include "services/QuanLyKhachHang.h"
+#include "services/Quanlykhachhang.h"
 
 class Dashboard
 {

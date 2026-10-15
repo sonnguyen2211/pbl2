@@ -1,4 +1,4 @@
-#include "QuanLyMaGiamGia.h"
+#include "Quanlymagiamgia.h"
 #include <fstream>
 #include <sstream>
 #include <iomanip>

@@ -5,8 +5,8 @@
 #include <vector>
 #include "QuanLyBanHang.h" // ChiTietDonHang (tai su dung)
 #include "QuanLyMonAn.h"
-#include "QuanLyKhachHang.h"
-#include "QuanLyMaGiamGia.h"
+#include "Quanlykhachhang.h"
+#include "Quanlymagiamgia.h"
 
 using namespace std;
 

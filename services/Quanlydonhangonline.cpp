@@ -1,5 +1,5 @@
-#include "QuanLyDonHangOnline.h"
-#include "QuanLyGioHang.h" // dinh nghia day du cua GioHang (chi dung trong .cpp)
+#include "Quanlydonhangonline.h"
+#include "Quanlygiohang.h" // dinh nghia day du cua GioHang (chi dung trong .cpp)
 #include "../utils/Utils.h"
 #include <ctime>
 #include <fstream>

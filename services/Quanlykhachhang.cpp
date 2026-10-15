@@ -1,4 +1,4 @@
-#include "QuanLyKhachHang.h"
+#include "Quanlykhachhang.h"
 #include "../utils/Utils.h"
 #include <iostream>
 #include <fstream>
@@ -208,7 +208,7 @@ void QuanLyKhachHang::dangKy()
     do
     {
         cout << "  Tên đăng nhập: ";
-        cin >> tenDangNhap;
+        getline(cin, tenDangNhap);
         if (tenDangNhap.empty())
         {
             cout << "  ❌ Tên đăng nhập không được để trống!\n";
@@ -229,7 +229,7 @@ void QuanLyKhachHang::dangKy()
     do
     {
         cout << "  Mật khẩu (ít nhất 6 ký tự): ";
-        cin >> matKhau;
+        getline(cin, matKhau);
         if (matKhau.size() < 6)
         {
             cout << "  ❌ Mật khẩu phải có ít nhất 6 ký tự!\n";
@@ -241,7 +241,6 @@ void QuanLyKhachHang::dangKy()
         }
     } while (!hopLe);
 
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     string hoTen, sdt, diaChi;
     cout << "  Họ và tên: ";
     getline(cin, hoTen);
