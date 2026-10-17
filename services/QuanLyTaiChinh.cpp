@@ -11,6 +11,41 @@ using namespace std;
 namespace
 {
     const char *FILE_THU_CHI = "data/thuchi.txt";
+    // std::setw counts UTF-8 bytes, while terminals display Vietnamese by
+    // characters. Build fixed-width cells by counting UTF-8 code points.
+    size_t soKyTu(const string &s)
+    {
+        size_t n = 0;
+        for (size_t i = 0; i < s.size(); ++n)
+        {
+            unsigned char c = static_cast<unsigned char>(s[i]);
+            i += c < 0x80 ? 1 : (c & 0xE0) == 0xC0 ? 2 : (c & 0xF0) == 0xE0 ? 3 : 4;
+        }
+        return n;
+    }
+    string catKyTu(const string &s, size_t maxKyTu)
+    {
+        size_t limit = maxKyTu;
+        bool cat = soKyTu(s) > maxKyTu;
+        if (cat && limit > 0) --limit;
+        size_t i = 0, kyTu = 0;
+        while (i < s.size() && kyTu < limit)
+        {
+            unsigned char c = static_cast<unsigned char>(s[i]);
+            size_t bytes = c < 0x80 ? 1 : (c & 0xE0) == 0xC0 ? 2 : (c & 0xF0) == 0xE0 ? 3 : 4;
+            if (i + bytes > s.size()) bytes = 1;
+            i += bytes;
+            ++kyTu;
+        }
+        return cat && maxKyTu > 0 ? s.substr(0, i) + "…" : s;
+    }
+    string o(const string &s, size_t width, bool right = false)
+    {
+        string v = catKyTu(s, width);
+        size_t n = soKyTu(v);
+        if (n >= width) return v;
+        return right ? string(width - n, ' ') + v : v + string(width - n, ' ');
+    }
     string ngayHienTai()
     {
         time_t now = time(NULL); tm *t = localtime(&now); char b[16];
@@ -49,13 +84,16 @@ bool QuanLyTaiChinh::daCoMa(const string &ma) const
 void QuanLyTaiChinh::hienThiDanhSach() const
 {
     xoaManHinh();
-    cout << "\n  LỊCH SỬ THU CHI\n  " << left << setw(20) << "Mã GD" << setw(8) << "Loại" << setw(18) << "Danh mục"
-         << right << setw(16) << "Số tiền" << "  " << left << setw(12) << "Ngày" << "Ghi chú\n";
-    cout << "  " << string(94, '-') << "\n";
+    cout << "\n  LỊCH SỬ THU CHI\n  " << o("Mã GD", 18) << " " << o("Loại", 6) << " " << o("Danh mục", 14)
+         << " " << o("Số tiền", 12, true) << " " << o("Ngày", 10) << " " << o("Ghi chú", 28) << "\n";
+    cout << "  " << string(96, '-') << "\n";
     for (size_t i = 0; i < danhSach.size(); ++i)
-        cout << "  " << left << setw(20) << danhSach[i].maGiaoDich << setw(8) << danhSach[i].loai
-             << setw(18) << danhSach[i].danhMuc << right << setw(16) << fixed << setprecision(0) << danhSach[i].soTien
-             << "  " << left << setw(12) << danhSach[i].ngay << danhSach[i].ghiChu << '\n';
+    {
+        ostringstream tien; tien << fixed << setprecision(0) << danhSach[i].soTien;
+        cout << "  " << o(danhSach[i].maGiaoDich, 18) << " " << o(danhSach[i].loai, 6) << " "
+             << o(danhSach[i].danhMuc, 14) << " " << o(tien.str(), 12, true) << " "
+             << o(danhSach[i].ngay, 10) << " " << o(danhSach[i].ghiChu, 28) << '\n';
+    }
     if (danhSach.empty()) cout << "  (Chưa có giao dịch)\n";
     dungManHinh();
 }
@@ -66,6 +104,7 @@ void QuanLyTaiChinh::nhapGiaoDich()
     vector<string> loai = {"1. Thu", "2. Chi"};
     gd.loai = chonMenuMuiTen("CHỌN LOẠI GIAO DỊCH", loai) == 0 ? "Thu" : "Chi";
     vector<string> dm = {"Bán hàng", "Nhập kho", "Điện nước", "Lương", "Khác"};
+    if (gd.loai == "Thu") dm.erase(dm.begin());
     int chon = chonMenuMuiTen("CHỌN DANH MỤC", dm); gd.danhMuc = dm[chon];
     cout << "Số tiền (VND): ";
     while (!(cin >> gd.soTien) || gd.soTien <= 0) { cin.clear(); cin.ignore(numeric_limits<streamsize>::max(), '\n'); cout << "Nhập số tiền lớn hơn 0: "; }

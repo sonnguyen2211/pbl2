@@ -455,14 +455,8 @@ void QuanLyMonAn::nhapTuyChonPhucVu(MonAn &mon)
 // ============================================================
 void QuanLyMonAn::themMon()
 {
-    // BUOC 1: Chon loai kieu mon
-    vector<string> dsKieuMon = {
-        "1. Món thông thường",
-        "2. Món theo nguyên liệu",
-        "3. Món theo nhóm"
-    };
-    int viTriKieu = chonMenuMuiTen("➕ THÊM MÓN MỚI — BƯỚC 1: CHỌN LOẠI MÓN", dsKieuMon);
-    int kieu = viTriKieu + 1;
+    // Thêm món mới mặc định dùng luồng món thông thường.
+    int kieu = 1;
 
     // Nhap ma mon
     string ma;

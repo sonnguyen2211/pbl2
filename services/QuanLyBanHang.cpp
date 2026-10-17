@@ -391,9 +391,9 @@ void QuanLyBanHang::hienThiMenu(const NguoiDung &nguoiDung)
 {
     while (true)
     {
-        vector<string> ds = {"1. Tạo đơn hàng", "2. Xem đơn hàng", "3. Sửa đơn hàng", "4. Hủy đơn hàng", "5. Thanh toán", "6. Xem hóa đơn", "7. Tìm kiếm hóa đơn", "8. Lọc hóa đơn", "9. Thống kê bán hàng", "0. Quay lại"};
+        vector<string> ds = {"1. Tạo đơn hàng", "2. Xem đơn hàng", "3. Sửa đơn hàng", "4. Hủy đơn hàng", "5. Thanh toán", "0. Quay lại"};
         int chon = chonMenuMuiTen("QUẢN LÝ BÁN HÀNG", ds);
         if (chon == 0) taoDonHang(nguoiDung); else if (chon == 1) { xoaManHinh(); cout << "\n  DANH SÁCH ĐƠN HÀNG\n"; hienThiDanhSach(DON_NHAP); dungManHinh(); }
-        else if (chon == 2) suaDonHang(); else if (chon == 3) huyDonHang(); else if (chon == 4) thanhToanDonHang(); else if (chon == 5) xemHoaDon(); else if (chon == 6) timKiemHoaDon(); else if (chon == 7) locHoaDon(); else if (chon == 8) thongKeBanHang(); else return;
+        else if (chon == 2) suaDonHang(); else if (chon == 3) huyDonHang(); else if (chon == 4) thanhToanDonHang(); else return;
     }
 }

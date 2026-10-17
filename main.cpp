@@ -12,7 +12,7 @@ int main()
     SetConsoleCP(CP_UTF8);
 #endif
 
-    Dashboard dashboard; //code ngu vl
+    Dashboard dashboard;
     dashboard.chay();
 
     return 0;
