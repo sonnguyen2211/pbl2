@@ -20,7 +20,9 @@ enum TrangThaiDonOnline
     DANG_CHE_BIEN = 2,
     DANG_GIAO = 3,
     HOAN_THANH = 4,
-    DA_HUY_ONLINE = 5
+    DA_HUY_ONLINE = 5,
+    DA_XAC_NHAN = 6,
+    TU_CHOI_ONLINE = 7
 };
 
 // ============================================================
@@ -36,6 +38,7 @@ private:
     string ghiChu;
     string maGiamGiaApDung;
     double soTienGiam;
+    string lyDoTuChoi;
 
 public:
     DonHangOnline();
@@ -46,6 +49,7 @@ public:
     string layMaGiamGiaApDung() const;
     double laySoTienGiam() const;
     double layThanhTien() const; // = layTongTien() - soTienGiam
+    string layLyDoTuChoi() const;
 
     string layTenTrangThaiOnline() const; // nhan hien thi rieng cho don online
     bool coTheHuy() const;                // chi khi dang CHO_XAC_NHAN
@@ -56,6 +60,7 @@ public:
     void datGhiChu(const string &gc);
     void datMaGiamGiaApDung(const string &ma);
     void datSoTienGiam(double soTien);
+    void datLyDoTuChoi(const string &lyDo);
 
     void hienThiChiTiet() const override; // ghi de ban virtual cua HoaDon (da hinh)
 
@@ -85,9 +90,11 @@ public:
 
     // Menu "Don hang cua toi": xem danh sach + xem chi tiet + huy don (neu con cho xac nhan)
     void xemDonHangCuaToi(const KhachHang &khachHang);
+    void quanLyDonChoXacNhan();
 
     // Dung cho module Danh gia: lay vi tri cac don da hoan thanh cua 1 khach hang
     vector<int> layViTriDonHoanThanh(const string &maKhachHang) const;
+    vector<int> layViTriDonCuaKhach(const string &maKhachHang) const;
     const DonHangOnline &layDonTheoViTri(int viTri) const;
 };
 

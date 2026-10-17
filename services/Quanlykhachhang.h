@@ -71,6 +71,9 @@ public:
 
     // Menu "Thong tin tai khoan": xem + doi ten hien thi + doi mat khau
     void hienThiThongTinTaiKhoan(const KhachHang &khachHangHienTai);
+
+    // Chuc nang danh cho nguoi quan ly
+    void hienThiMenuQuanLy();
 };
 
 #endif

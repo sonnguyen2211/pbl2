@@ -32,6 +32,7 @@ string DonHangOnline::layGhiChu() const { return ghiChu; }
 string DonHangOnline::layMaGiamGiaApDung() const { return maGiamGiaApDung; }
 double DonHangOnline::laySoTienGiam() const { return soTienGiam; }
 double DonHangOnline::layThanhTien() const { return layTongTien() - soTienGiam; }
+string DonHangOnline::layLyDoTuChoi() const { return lyDoTuChoi; }
 
 string DonHangOnline::layTenTrangThaiOnline() const
 {
@@ -42,6 +43,8 @@ string DonHangOnline::layTenTrangThaiOnline() const
         case DANG_GIAO: return "🚚 Đang giao";
         case HOAN_THANH: return "✅ Hoàn thành";
         case DA_HUY_ONLINE: return "❌ Đã hủy";
+        case DA_XAC_NHAN: return "✅ Đã xác nhận";
+        case TU_CHOI_ONLINE: return "⛔ Đã từ chối";
         default: return "Không rõ";
     }
 }
@@ -54,6 +57,7 @@ void DonHangOnline::datDiaChiGiao(const string &dc) { diaChiGiao = dc; }
 void DonHangOnline::datGhiChu(const string &gc) { ghiChu = gc; }
 void DonHangOnline::datMaGiamGiaApDung(const string &ma) { maGiamGiaApDung = ma; }
 void DonHangOnline::datSoTienGiam(double soTien) { soTienGiam = soTien; }
+void DonHangOnline::datLyDoTuChoi(const string &lyDo) { lyDoTuChoi = lyDo; }
 
 void DonHangOnline::hienThiChiTiet() const
 {
@@ -62,6 +66,7 @@ void DonHangOnline::hienThiChiTiet() const
     cout << "  Hình thức  : 🛵 Giao hàng tận nhà\n";
     cout << "  Địa chỉ    : " << diaChiGiao << "\n";
     if (!ghiChu.empty()) cout << "  Ghi chú    : " << ghiChu << "\n";
+    if (!lyDoTuChoi.empty()) cout << "  Lý do từ chối: " << lyDoTuChoi << "\n";
     cout << "  ────────────────────────────────────────────────────\n";
     const vector<ChiTietDonHang> &ct = layChiTiet();
     if (ct.empty()) cout << "  (Chưa có món)\n";
@@ -81,7 +86,7 @@ string DonHangOnline::chuyenThanhDong() const
     ostringstream oss;
     oss << HoaDon::chuyenThanhDong(); // ma|ngay|tenKhach|trangThai|tongTien|chiTiet
     oss << "|" << maKhachHang << "|" << diaChiGiao << "|" << ghiChu << "|"
-        << maGiamGiaApDung << "|" << fixed << setprecision(0) << soTienGiam;
+        << maGiamGiaApDung << "|" << fixed << setprecision(0) << soTienGiam << "|" << lyDoTuChoi;
     return oss.str();
 }
 
@@ -102,6 +107,7 @@ void DonHangOnline::docTuDong(const string &dong)
     ghiChu = truong[8];
     maGiamGiaApDung = truong[9];
     soTienGiam = atof(truong[10].c_str());
+    lyDoTuChoi = (truong.size() >= 12 ? truong[11] : "");
 }
 
 // ============================================================
@@ -207,6 +213,65 @@ void QuanLyDonHangOnline::xemChiTietVaHuyDon(int viTri)
     }
 }
 
+void QuanLyDonHangOnline::quanLyDonChoXacNhan()
+{
+    while (true)
+    {
+        vector<int> viTriCho;
+        vector<string> ds;
+        for (int i = (int)danhSach.size() - 1; i >= 0; --i)
+        {
+            if (danhSach[i].layTrangThai() != CHO_XAC_NHAN) continue;
+            viTriCho.push_back(i);
+            ds.push_back(danhSach[i].layMaHoaDon() + " | " + danhSach[i].layTenNhanVien() +
+                         " | " + danhSach[i].layNgayTao() + " | " +
+                         to_string((long long)danhSach[i].layThanhTien()) + " VND");
+        }
+        if (ds.empty())
+        {
+            xoaManHinh();
+            cout << "\n  Hiện không có đơn hàng nào đang chờ xác nhận.\n";
+            dungManHinh();
+            return;
+        }
+        ds.push_back("0. Quay lại");
+        int chon = chonMenuMuiTen("ĐƠN HÀNG CHỜ XÁC NHẬN", ds);
+        if (chon == (int)ds.size() - 1) return;
+
+        DonHangOnline &don = danhSach[viTriCho[chon]];
+        xoaManHinh();
+        cout << "\n  ĐƠN HÀNG " << don.layMaHoaDon() << "\n";
+        cout << "  Khách hàng: " << don.layTenNhanVien() << " (" << don.layMaKhachHang() << ")\n";
+        don.hienThiChiTiet();
+        vector<string> hanhDong = {"1. Xác nhận đơn", "2. Từ chối đơn", "0. Quay lại danh sách"};
+        int thaoTac = chonMenuMuiTen("CHỌN XỬ LÝ ĐƠN", hanhDong);
+        if (thaoTac == 2) continue;
+        if (thaoTac == 0)
+        {
+            don.datTrangThai(DA_XAC_NHAN);
+            ghiFile();
+            xoaManHinh();
+            cout << "\n  Đã xác nhận đơn " << don.layMaHoaDon() << ".\n";
+            dungManHinh();
+        }
+        else
+        {
+            string lyDo;
+            do
+            {
+                cout << "\n  Nhập lý do từ chối (bắt buộc): ";
+                getline(cin, lyDo);
+                if (lyDo.empty()) cout << "  Lý do không được để trống.\n";
+            } while (lyDo.empty());
+            don.datLyDoTuChoi(lyDo);
+            don.datTrangThai(TU_CHOI_ONLINE);
+            ghiFile();
+            cout << "  Đã từ chối đơn và gửi lý do cho khách hàng.\n";
+            dungManHinh();
+        }
+    }
+}
+
 void QuanLyDonHangOnline::xemDonHangCuaToi(const KhachHang &khachHang)
 {
     while (true)
@@ -246,6 +311,15 @@ vector<int> QuanLyDonHangOnline::layViTriDonHoanThanh(const string &maKhachHang)
     for (size_t i = 0; i < danhSach.size(); i++)
         if (danhSach[i].layMaKhachHang() == maKhachHang && danhSach[i].daHoanThanh())
             ketQua.push_back((int)i);
+    return ketQua;
+}
+
+vector<int> QuanLyDonHangOnline::layViTriDonCuaKhach(const string &maKhachHang) const
+{
+    vector<int> ketQua;
+    for (int i = (int)danhSach.size() - 1; i >= 0; --i)
+        if (danhSach[i].layMaKhachHang() == maKhachHang)
+            ketQua.push_back(i);
     return ketQua;
 }
 

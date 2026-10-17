@@ -22,8 +22,9 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
         vector<string> dsMenu = {
             "1. Bán hàng",
             "2. Quản lý thực đơn",
-            "3. Quản lý khách hàng (đang phát triển)",
-            "4. Quản lý nhân viên",
+            "3. Quản lý khách hàng",
+            "4. Quản lý đơn hàng online (xác nhận/từ chối)",
+            "5. Quản lý nhân viên",
             "6. Quản lý tài chính & Báo cáo",
             "0. Đăng xuất"
         };
@@ -43,11 +44,15 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
             QuanLyMonAn qlMonAn;
             qlMonAn.hienThiMenu(nguoiDung);
         }
-        else if (muc.find("khách hàng") != string::npos)
+        else if (muc.find("Quản lý đơn hàng online") != string::npos)
         {
-            xoaManHinh();
-            cout << "\nChức năng quản lý khách hàng đang được phát triển.\n";
-            dungManHinh();
+            QuanLyDonHangOnline qlDonOnline;
+            qlDonOnline.quanLyDonChoXacNhan();
+        }
+        else if (muc.find("Quản lý khách hàng") != string::npos)
+        {
+            QuanLyKhachHang qlKhachHang;
+            qlKhachHang.hienThiMenuQuanLy();
         }
         else if (muc.find("Quản lý nhân viên") != string::npos)
         {
