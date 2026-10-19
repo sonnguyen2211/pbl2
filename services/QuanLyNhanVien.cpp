@@ -32,6 +32,7 @@ NhanVien::NhanVien(string maNV, string tenDangNhap, string matKhau, string hoTen
 
 string NhanVien::layMaNhanVien() const { return maNhanVien; }
 string NhanVien::laySoDienThoai() const { return soDienThoai; }
+string NhanVien::layDiaChi() const { return diaChi; }
 int NhanVien::layTrangThai() const { return trangThai; }
 
 string NhanVien::layTenTrangThai() const
@@ -50,6 +51,7 @@ bool NhanVien::laDangBiKhoa() const { return taiKhoanBiKhoa; }
 
 void NhanVien::datMaNhanVien(string ma) { maNhanVien = ma; }
 void NhanVien::datSoDienThoai(string sdt) { soDienThoai = sdt; }
+void NhanVien::datDiaChi(string dc) { diaChi = dc; }
 void NhanVien::datTrangThai(int tt) { trangThai = tt; }
 void NhanVien::datChoPhepDangNhap(bool cp) { choPhepDangNhap = cp; }
 void NhanVien::datTaiKhoanBiKhoa(bool khoa) { taiKhoanBiKhoa = khoa; }
@@ -76,13 +78,13 @@ string NhanVien::chuyenThanhDong() const
     ostringstream oss;
     oss << maNhanVien << "|" << layTenDangNhap() << "|" << layMatKhau() << "|"
         << layHoTen() << "|" << soDienThoai << "|" << (int)layVaiTro() << "|"
-        << trangThai << "|" << (choPhepDangNhap ? 1 : 0) << "|" << (taiKhoanBiKhoa ? 1 : 0);
+        << trangThai << "|" << (choPhepDangNhap ? 1 : 0) << "|" << (taiKhoanBiKhoa ? 1 : 0) << "|" << diaChi;
     return oss.str();
 }
 
 void NhanVien::docTuDong(const string &dong)
 {
-    const int SO_TRUONG = 9;
+    const int SO_TRUONG = 10;
     string cac[SO_TRUONG];
     int chiSo = 0;
     string tam = "";
@@ -109,6 +111,7 @@ void NhanVien::docTuDong(const string &dong)
     soDienThoai = cac[4];
 
     int vt = atoi(cac[5].c_str());
+    if (vt == 3) vt = PHUC_VU;
     if (vt < QUAN_LY || vt > PHUC_VU) vt = PHUC_VU;
     datVaiTro((VaiTro)vt);
 
@@ -117,6 +120,7 @@ void NhanVien::docTuDong(const string &dong)
 
     choPhepDangNhap = (atoi(cac[7].c_str()) == 1);
     taiKhoanBiKhoa = (atoi(cac[8].c_str()) == 1);
+    diaChi = cac[9];
 }
 
 // ============================================================
@@ -210,20 +214,37 @@ void QuanLyNhanVien::themNhanVien()
         }
     } while (!maHopLe);
 
-    string hoTen, sdt;
+    string hoTen, sdt, diaChi;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    cout << "  Họ và tên: ";
-    getline(cin, hoTen);
-    cout << "  Số điện thoại: ";
-    getline(cin, sdt);
+    do
+    {
+        cout << "  Họ và tên: ";
+        getline(cin, hoTen);
+        if (hoTen.empty()) cout << "  Họ tên không được để trống.\n";
+    } while (hoTen.empty());
+    bool sdtHopLe;
+    do
+    {
+        cout << "  Số điện thoại (10 số): ";
+        getline(cin, sdt);
+        sdtHopLe = sdt.size() == 10;
+        for (size_t i = 0; i < sdt.size(); ++i)
+            if (sdt[i] < '0' || sdt[i] > '9') sdtHopLe = false;
+        if (!sdtHopLe) cout << "  Số điện thoại phải gồm đúng 10 chữ số.\n";
+    } while (!sdtHopLe);
+    do
+    {
+        cout << "  Địa chỉ: ";
+        getline(cin, diaChi);
+        if (diaChi.empty()) cout << "  Địa chỉ không được để trống.\n";
+    } while (diaChi.empty());
 
     vector<string> dsVaiTro = {
         "1. Quản lý",
-        "2. Thu ngân",
-        "3. Phục vụ"
+        "2. Phục vụ"
     };
     int vt = chonMenuMuiTen("💼 CHỌN VAI TRÒ", dsVaiTro);
-    VaiTro vaiTroChon = (VaiTro)(vt + 1);
+    VaiTro vaiTroChon = vt == 0 ? QUAN_LY : PHUC_VU;
 
     vector<string> dsChoPhep = {
         "1. Có (Được phép đăng nhập)",
@@ -260,6 +281,7 @@ void QuanLyNhanVien::themNhanVien()
     }
 
     NhanVien nvMoi(ma, tenDangNhap, matKhau, hoTen, sdt, vaiTroChon, choPhep);
+    nvMoi.datDiaChi(diaChi);
 
     ostringstream ossXN;
     ossXN << "\n  ═══════════════════════════════════════════════\n";
@@ -268,6 +290,7 @@ void QuanLyNhanVien::themNhanVien()
     ossXN << "  Mã NV: " << nvMoi.layMaNhanVien() << "\n";
     ossXN << "  Họ tên: " << nvMoi.layHoTen() << "\n";
     ossXN << "  SĐT: " << nvMoi.laySoDienThoai() << "\n";
+    ossXN << "  Địa chỉ: " << nvMoi.layDiaChi() << "\n";
     ossXN << "  Vai trò: " << nvMoi.layTenVaiTro() << "\n";
     ossXN << "  Trạng thái: " << nvMoi.layTenTrangThai() << "\n";
     ossXN << "  Tài khoản đăng nhập: " << nvMoi.layTenDangNhap()
@@ -321,16 +344,20 @@ void QuanLyNhanVien::suaNhanVien()
         return;
     }
 
+    NhanVien banDau = danhSach[viTri];
     vector<string> dsSua = {
         "1. Sửa họ tên",
         "2. Sửa số điện thoại",
-        "3. Sửa vai trò",
-        "4. Đổi mật khẩu",
-        "5. Bật/tắt quyền đăng nhập",
-        "0. Hoàn tất"
+        "3. Sửa địa chỉ",
+        "4. Sửa vai trò",
+        "5. Đổi mật khẩu",
+        "6. Bật/tắt quyền đăng nhập",
+        "7. Lưu thay đổi và hoàn tất",
+        "8. Hủy thông tin đã sửa"
     };
 
     bool tiepTuc = true;
+    bool huyThayDoi = false;
     while (tiepTuc)
     {
         ostringstream oss;
@@ -342,6 +369,7 @@ void QuanLyNhanVien::suaNhanVien()
         oss << "  Mã NV: " << danhSach[viTri].layMaNhanVien() << "\n";
         oss << "  Họ tên: " << danhSach[viTri].layHoTen() << "\n";
         oss << "  SĐT: " << danhSach[viTri].laySoDienThoai() << "\n";
+        oss << "  Địa chỉ: " << danhSach[viTri].layDiaChi() << "\n";
         oss << "  Vai trò: " << danhSach[viTri].layTenVaiTro() << "\n";
         oss << "  Trạng thái: " << danhSach[viTri].layTenTrangThai() << "\n";
         oss << "  Tài khoản đăng nhập: " << (danhSach[viTri].layTenDangNhap().empty() ? "(chưa có)" : danhSach[viTri].layTenDangNhap())
@@ -363,18 +391,17 @@ void QuanLyNhanVien::suaNhanVien()
             cout << "  ═══════════════════════════════════════════════\n";
             cout << "  Họ tên hiện tại: " << danhSach[viTri].layHoTen() << "\n";
             cout << "  Nhập họ tên mới: ";
-            getline(cin, ten);
-            if (!ten.empty())
+            do
             {
-                danhSach[viTri].doiHoTen(ten);
-                xoaManHinh();
-                cout << "\n  ✅ Đã cập nhật họ tên!\n";
-            }
-            else
-            {
-                xoaManHinh();
-                cout << "\n  ⚠ Không thay đổi họ tên.\n";
-            }
+                getline(cin, ten);
+                if (ten.find_first_not_of(" \t\r\n") == string::npos)
+                {
+                    cout << "  Họ tên không được để trống, nhập lại: ";
+                    ten.clear();
+                }
+            } while (ten.empty());
+            danhSach[viTri].doiHoTen(ten);
+            cout << "\n  ✅ Đã cập nhật họ tên!\n";
             dungManHinh();
             break;
         }
@@ -386,40 +413,54 @@ void QuanLyNhanVien::suaNhanVien()
             cout << "  📞 SỬA SỐ ĐIỆN THOẠI NHÂN VIÊN\n";
             cout << "  ═══════════════════════════════════════════════\n";
             cout << "  SĐT hiện tại: " << danhSach[viTri].laySoDienThoai() << "\n";
-            cout << "  Nhập số điện thoại mới: ";
-            getline(cin, sdtMoi);
-            if (!sdtMoi.empty())
+            bool hopLe;
+            do
             {
-                danhSach[viTri].datSoDienThoai(sdtMoi);
-                xoaManHinh();
-                cout << "\n  ✅ Đã cập nhật số điện thoại!\n";
-            }
-            else
-            {
-                xoaManHinh();
-                cout << "\n  ⚠ Không thay đổi số điện thoại.\n";
-            }
+                cout << "  Nhập số điện thoại mới (10 số): ";
+                getline(cin, sdtMoi);
+                hopLe = sdtMoi.size() == 10;
+                for (size_t i = 0; i < sdtMoi.size(); ++i)
+                    if (sdtMoi[i] < '0' || sdtMoi[i] > '9') hopLe = false;
+                if (!hopLe) cout << "  Số điện thoại phải gồm đúng 10 chữ số.\n";
+            } while (!hopLe);
+            danhSach[viTri].datSoDienThoai(sdtMoi);
+            cout << "\n  ✅ Đã cập nhật số điện thoại!\n";
             dungManHinh();
             break;
         }
-        case 2: // Sửa vai trò
+        case 2:
+        {
+            string diaChi;
+            do
+            {
+                cout << "  Địa chỉ mới: ";
+                getline(cin, diaChi);
+                if (diaChi.find_first_not_of(" \t\r\n") == string::npos)
+                {
+                    diaChi.clear();
+                    cout << "  Địa chỉ không được để trống.\n";
+                }
+            } while (diaChi.empty());
+            danhSach[viTri].datDiaChi(diaChi);
+            break;
+        }
+        case 3: // Sửa vai trò
         {
             vector<string> dsVaiTro = {
                 "1. Quản lý",
-                "2. Thu ngân",
-                "3. Phục vụ"
+                "2. Phục vụ"
             };
-            int vt = chonMenuMuiTen("💼 CHỌN VAI TRÒ MỚI", dsVaiTro, (int)danhSach[viTri].layVaiTro() - 1);
-            if (vt >= 0 && vt <= 2)
+            int vt = chonMenuMuiTen("💼 CHỌN VAI TRÒ MỚI", dsVaiTro, danhSach[viTri].layVaiTro() == QUAN_LY ? 0 : 1);
+            if (vt >= 0 && vt <= 1)
             {
-                danhSach[viTri].doiVaiTro((VaiTro)(vt + 1));
+                danhSach[viTri].doiVaiTro(vt == 0 ? QUAN_LY : PHUC_VU);
                 xoaManHinh();
                 cout << "\n  ✅ Đã cập nhật vai trò thành: " << danhSach[viTri].layTenVaiTro() << "\n";
                 dungManHinh();
             }
             break;
         }
-        case 3: // Đổi mật khẩu
+        case 4: // Đổi mật khẩu
         {
             xoaManHinh();
             if (!danhSach[viTri].laDuocPhepDangNhap())
@@ -441,7 +482,7 @@ void QuanLyNhanVien::suaNhanVien()
             dungManHinh();
             break;
         }
-        case 4: // Bật/tắt quyền đăng nhập
+        case 5: // Bật/tắt quyền đăng nhập
         {
             bool trangThaiMoi = !danhSach[viTri].laDuocPhepDangNhap();
             danhSach[viTri].datChoPhepDangNhap(trangThaiMoi);
@@ -451,15 +492,39 @@ void QuanLyNhanVien::suaNhanVien()
             dungManHinh();
             break;
         }
-        case 5: // Hoàn tất (0. Hoàn tất)
+        case 6:
+        {
+            const string &ten = danhSach[viTri].layHoTen();
+            const string &sdt = danhSach[viTri].laySoDienThoai();
+            bool sdtHopLe = sdt.size() == 10;
+            for (size_t i = 0; i < sdt.size(); ++i)
+                if (sdt[i] < '0' || sdt[i] > '9') sdtHopLe = false;
+            if (ten.find_first_not_of(" \t\r\n") == string::npos || !sdtHopLe ||
+                danhSach[viTri].layDiaChi().find_first_not_of(" \t\r\n") == string::npos)
+            {
+                cout << "  Họ tên, địa chỉ và số điện thoại hợp lệ là bắt buộc trước khi lưu.\n";
+                dungManHinh();
+            }
+            else tiepTuc = false;
+            break;
+        }
+        case 7:
+            huyThayDoi = true;
             tiepTuc = false;
             break;
         }
     }
 
-    ghiFile();
-    xoaManHinh();
-    cout << "\n  ✅ Đã lưu các thay đổi!\n";
+    if (huyThayDoi)
+    {
+        danhSach[viTri] = banDau;
+        cout << "  Đã hủy các thay đổi.\n";
+    }
+    else
+    {
+        ghiFile();
+        cout << "  ✅ Đã lưu các thay đổi!\n";
+    }
     dungManHinh();
 }
 

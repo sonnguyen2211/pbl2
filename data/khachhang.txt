@@ -1,1 +1,3 @@
 KH001|son123|123456|nguyên hoang sơn|0978502448|dhbhdbhb|0|0
+KH002|Asahi neko-chan|06072007|Hirano Asahi|13013913|3901391039|0|0
+KH003|Hirano Asahi|06072007|Hirano Asahi        |1234567890|234567|0|0

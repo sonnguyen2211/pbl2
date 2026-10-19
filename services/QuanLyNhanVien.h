@@ -30,6 +30,7 @@ class NhanVien : public NguoiDung
 private:
     string maNhanVien;
     string soDienThoai;
+    string diaChi;
     int trangThai;        // DANG_LAM_VIEC / TAM_NGHI / NGHI_VIEC
     bool choPhepDangNhap; // co duoc phep dang nhap he thong hay khong
     bool taiKhoanBiKhoa;  // tai khoan dang bi khoa hay khong
@@ -42,6 +43,7 @@ public:
     // Getter
     string layMaNhanVien() const;
     string laySoDienThoai() const;
+    string layDiaChi() const;
     int layTrangThai() const;
     string layTenTrangThai() const;
     bool laDuocPhepDangNhap() const;
@@ -50,6 +52,7 @@ public:
     // Setter (thao tac tren du lieu rieng cua NhanVien)
     void datMaNhanVien(string ma);
     void datSoDienThoai(string sdt);
+    void datDiaChi(string dc);
     void datTrangThai(int tt);
     void datChoPhepDangNhap(bool cp);
     void datTaiKhoanBiKhoa(bool khoa);

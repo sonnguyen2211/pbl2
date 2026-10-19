@@ -1,5 +1,6 @@
 #include "Quanlydonhangonline.h"
 #include "Quanlygiohang.h" // dinh nghia day du cua GioHang (chi dung trong .cpp)
+#include "QuanLyTaiChinh.h"
 #include "../utils/Utils.h"
 #include <ctime>
 #include <fstream>
@@ -24,14 +25,12 @@ namespace
 // ============================================================
 // DONHANGONLINE
 // ============================================================
-DonHangOnline::DonHangOnline() : soTienGiam(0) {}
+DonHangOnline::DonHangOnline() {}
 
 string DonHangOnline::layMaKhachHang() const { return maKhachHang; }
 string DonHangOnline::layDiaChiGiao() const { return diaChiGiao; }
 string DonHangOnline::layGhiChu() const { return ghiChu; }
-string DonHangOnline::layMaGiamGiaApDung() const { return maGiamGiaApDung; }
-double DonHangOnline::laySoTienGiam() const { return soTienGiam; }
-double DonHangOnline::layThanhTien() const { return layTongTien() - soTienGiam; }
+double DonHangOnline::layThanhTien() const { return layTongTien(); }
 string DonHangOnline::layLyDoTuChoi() const { return lyDoTuChoi; }
 
 string DonHangOnline::layTenTrangThaiOnline() const
@@ -45,6 +44,7 @@ string DonHangOnline::layTenTrangThaiOnline() const
         case DA_HUY_ONLINE: return "❌ Đã hủy";
         case DA_XAC_NHAN: return "✅ Đã xác nhận";
         case TU_CHOI_ONLINE: return "⛔ Đã từ chối";
+        case DA_THANH_TOAN_ONLINE: return "💳 Đã thanh toán";
         default: return "Không rõ";
     }
 }
@@ -55,8 +55,6 @@ bool DonHangOnline::daHoanThanh() const { return layTrangThai() == HOAN_THANH; }
 void DonHangOnline::datMaKhachHang(const string &ma) { maKhachHang = ma; }
 void DonHangOnline::datDiaChiGiao(const string &dc) { diaChiGiao = dc; }
 void DonHangOnline::datGhiChu(const string &gc) { ghiChu = gc; }
-void DonHangOnline::datMaGiamGiaApDung(const string &ma) { maGiamGiaApDung = ma; }
-void DonHangOnline::datSoTienGiam(double soTien) { soTienGiam = soTien; }
 void DonHangOnline::datLyDoTuChoi(const string &lyDo) { lyDoTuChoi = lyDo; }
 
 void DonHangOnline::hienThiChiTiet() const
@@ -75,8 +73,6 @@ void DonHangOnline::hienThiChiTiet() const
              << fixed << setprecision(0) << ct[i].donGia << " = " << ct[i].thanhTien() << "\n";
     cout << "  ────────────────────────────────────────────────────\n";
     cout << "  Tạm tính   : " << fixed << setprecision(0) << layTongTien() << "\n";
-    if (!maGiamGiaApDung.empty())
-        cout << "  Mã giảm giá: " << maGiamGiaApDung << "   -" << soTienGiam << "\n";
     cout << "  ────────────────────────────────────────────────────\n";
     cout << "  THÀNH TIỀN : " << layThanhTien() << " VND\n";
 }
@@ -86,7 +82,7 @@ string DonHangOnline::chuyenThanhDong() const
     ostringstream oss;
     oss << HoaDon::chuyenThanhDong(); // ma|ngay|tenKhach|trangThai|tongTien|chiTiet
     oss << "|" << maKhachHang << "|" << diaChiGiao << "|" << ghiChu << "|"
-        << maGiamGiaApDung << "|" << fixed << setprecision(0) << soTienGiam << "|" << lyDoTuChoi;
+        << "|0|" << lyDoTuChoi;
     return oss.str();
 }
 
@@ -105,8 +101,6 @@ void DonHangOnline::docTuDong(const string &dong)
     maKhachHang = truong[6];
     diaChiGiao = truong[7];
     ghiChu = truong[8];
-    maGiamGiaApDung = truong[9];
-    soTienGiam = atof(truong[10].c_str());
     lyDoTuChoi = (truong.size() >= 12 ? truong[11] : "");
 }
 
@@ -163,8 +157,6 @@ string QuanLyDonHangOnline::taoDonHang(const KhachHang &khachHang, const GioHang
     don.datMaKhachHang(khachHang.layMaKhachHang());
     don.datDiaChiGiao(diaChiGiao);
     don.datGhiChu(ghiChu);
-    don.datMaGiamGiaApDung(gio.layMaGiamGiaApDung());
-    don.datSoTienGiam(gio.laySoTienGiam());
     don.datTrangThai(CHO_XAC_NHAN);
 
     const vector<ChiTietDonHang> &ct = gio.layChiTiet();
@@ -265,11 +257,46 @@ void QuanLyDonHangOnline::quanLyDonChoXacNhan()
             } while (lyDo.empty());
             don.datLyDoTuChoi(lyDo);
             don.datTrangThai(TU_CHOI_ONLINE);
+            QuanLyMonAn qlMonAn;
+            const vector<ChiTietDonHang> &mon = don.layChiTiet();
+            for (size_t i = 0; i < mon.size(); ++i)
+                qlMonAn.capNhatSoLuongBan(mon[i].maMon, mon[i].soLuong);
             ghiFile();
             cout << "  Đã từ chối đơn và gửi lý do cho khách hàng.\n";
             dungManHinh();
         }
     }
+}
+
+void QuanLyDonHangOnline::thanhToanDonDaXacNhan()
+{
+    vector<int> viTriChoThanhToan;
+    vector<string> ds;
+    for (size_t i = 0; i < danhSach.size(); ++i)
+    {
+        if (danhSach[i].layTrangThai() != DA_XAC_NHAN) continue;
+        viTriChoThanhToan.push_back((int)i);
+        ds.push_back(danhSach[i].layMaHoaDon() + " | " + danhSach[i].layTenNhanVien() + " | " +
+                     to_string((long long)danhSach[i].layThanhTien()) + " VND");
+    }
+    if (ds.empty())
+    {
+        cout << "  Không có đơn online đã xác nhận cần thanh toán.\n";
+        dungManHinh();
+        return;
+    }
+    ds.push_back("0. Quay lại");
+    int chon = chonMenuMuiTen("THANH TOÁN ĐƠN ONLINE", ds);
+    if (chon < 0 || chon == (int)viTriChoThanhToan.size()) return;
+    DonHangOnline &don = danhSach[viTriChoThanhToan[chon]];
+    don.datTrangThai(DA_THANH_TOAN_ONLINE);
+    ghiFile();
+    string ngay = don.layNgayTao();
+    if (ngay.size() >= 10 && ngay[2] == '/' && ngay[5] == '/')
+        ngay = ngay.substr(6, 4) + "-" + ngay.substr(3, 2) + "-" + ngay.substr(0, 2);
+    QuanLyTaiChinh().ghiNhanDoanhThu(don.layMaHoaDon(), don.layTongTien(), ngay);
+    cout << "  Đã thanh toán đơn online " << don.layMaHoaDon() << ".\n";
+    dungManHinh();
 }
 
 void QuanLyDonHangOnline::xemDonHangCuaToi(const KhachHang &khachHang)

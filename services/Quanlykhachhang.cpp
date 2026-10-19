@@ -210,6 +210,9 @@ void QuanLyKhachHang::dangKy()
     {
         cout << "  Tên đăng nhập: ";
         getline(cin, tenDangNhap);
+        size_t dau = tenDangNhap.find_first_not_of(" \t\r\n");
+        size_t cuoi = tenDangNhap.find_last_not_of(" \t\r\n");
+        tenDangNhap = dau == string::npos ? "" : tenDangNhap.substr(dau, cuoi - dau + 1);
         if (tenDangNhap.empty())
         {
             cout << "  ❌ Tên đăng nhập không được để trống!\n";
@@ -243,12 +246,15 @@ void QuanLyKhachHang::dangKy()
     } while (!hopLe);
 
     string hoTen, sdt, diaChi;
-    cout << "  Họ và tên: ";
-    getline(cin, hoTen);
-    cout << "  Số điện thoại: ";
-    getline(cin, sdt);
-    cout << "  Địa chỉ: ";
-    getline(cin, diaChi);
+    do { cout << "  Họ và tên: "; getline(cin, hoTen); if (hoTen.empty()) cout << "  Họ tên không được để trống.\n"; } while (hoTen.empty());
+    bool sdtHopLe;
+    do {
+        cout << "  Số điện thoại (10 số): "; getline(cin, sdt);
+        sdtHopLe = sdt.size() == 10;
+        for (size_t i = 0; i < sdt.size(); ++i) if (sdt[i] < '0' || sdt[i] > '9') sdtHopLe = false;
+        if (!sdtHopLe) cout << "  Số điện thoại phải gồm đúng 10 chữ số.\n";
+    } while (!sdtHopLe);
+    do { cout << "  Địa chỉ: "; getline(cin, diaChi); if (diaChi.empty()) cout << "  Địa chỉ không được để trống.\n"; } while (diaChi.empty());
 
     string maMoi = taoMaKhachHang();
     KhachHang khMoi(maMoi, tenDangNhap, matKhau, hoTen, sdt, diaChi);
@@ -284,7 +290,6 @@ void QuanLyKhachHang::hienThiThongTinTaiKhoan(const KhachHang &khachHangHienTai)
         oss << "  Họ tên        : " << danhSach[viTri].layHoTen() << "\n";
         oss << "  SĐT           : " << danhSach[viTri].laySoDienThoai() << "\n";
         oss << "  Địa chỉ       : " << danhSach[viTri].layDiaChi() << "\n";
-        oss << "  Điểm tích lũy : " << danhSach[viTri].layDiemTichLuy() << "\n";
         oss << "  ════════════════════════════════════════════════════\n";
 
         vector<string> ds = {"1. ✏️ Đổi tên hiển thị", "2. 🔑 Đổi mật khẩu", "0. ⬅️ Quay lại"};
@@ -357,145 +362,46 @@ void QuanLyKhachHang::hienThiMenuQuanLy()
 {
     while (true)
     {
-        vector<string> menu = {
-            "1. Xem danh sách khách hàng",
-            "2. Tìm kiếm khách hàng",
-            "3. Xem chi tiết và lịch sử đơn hàng",
-            "4. Cập nhật thông tin khách hàng",
-            "5. Khóa / mở khóa tài khoản",
-            "6. Thống kê khách hàng",
-            "0. Quay lại"
-        };
+        vector<string> menu = {"1. Xem danh sách khách hàng", "2. Xem chi tiết và lịch sử đơn hàng", "0. Quay lại"};
         int chon = chonMenuMuiTen("QUẢN LÝ KHÁCH HÀNG", menu);
-        if (chon == 6) return;
-
+        if (chon == 2) return;
         if (chon == 0)
         {
             xoaManHinh();
-            if (danhSach.empty())
-            {
-                cout << "\n  Danh sách khách hàng đang trống.\n";
-                dungManHinh();
-                continue;
-            }
-            cout << "\n  DANH SÁCH KHÁCH HÀNG\n";
-            cout << "  Mã KH  | Họ tên | Số điện thoại | Địa chỉ | Điểm | Trạng thái\n";
-            cout << "  ---------------------------------------------------------------------------\n";
-            for (size_t i = 0; i < danhSach.size(); ++i)
-            {
-                const KhachHang &kh = danhSach[i];
-                cout << "  " << kh.layMaKhachHang() << " | " << kh.layHoTen() << " | "
-                     << kh.laySoDienThoai() << " | " << kh.layDiaChi() << " | "
-                     << kh.layDiemTichLuy() << " | "
-                     << (kh.laDangBiKhoa() ? "Đang khóa" : "Hoạt động") << "\n";
-            }
-            dungManHinh();
-        }
-        else if (chon == 1 || chon == 2)
-        {
-            string tuKhoa;
-            cout << "\n  Nhập mã, họ tên hoặc số điện thoại: ";
-            getline(cin, tuKhoa);
-            if (tuKhoa.empty())
-            {
-                cout << "  Từ khóa không được để trống.\n";
-                dungManHinh();
-                continue;
-            }
-            string tuKhoaThuong = chuyenThanhChuThuong(tuKhoa);
-            vector<int> timThay;
-            vector<string> luaChon;
-            for (size_t i = 0; i < danhSach.size(); ++i)
-            {
-                const KhachHang &kh = danhSach[i];
-                if (chuyenThanhChuThuong(kh.layMaKhachHang()).find(tuKhoaThuong) != string::npos ||
-                    chuyenThanhChuThuong(kh.layHoTen()).find(tuKhoaThuong) != string::npos ||
-                    chuyenThanhChuThuong(kh.laySoDienThoai()).find(tuKhoaThuong) != string::npos)
-                {
-                    timThay.push_back((int)i);
-                    luaChon.push_back(kh.layMaKhachHang() + " | " + kh.layHoTen() + " | " + kh.laySoDienThoai());
-                }
-            }
-            if (timThay.empty())
-            {
-                cout << "  Không tìm thấy khách hàng phù hợp.\n";
-                dungManHinh();
-                continue;
-            }
-            luaChon.push_back("Quay lại");
-            int chonKhach = chonMenuMuiTen("KẾT QUẢ TÌM KIẾM", luaChon);
-            if (chonKhach == (int)timThay.size()) continue;
-            int viTriKhach = timThay[chonKhach];
-            const KhachHang &kh = danhSach[viTriKhach];
-            QuanLyDonHangOnline qlDon;
-            xoaManHinh();
-            cout << "\n  CHI TIẾT KHÁCH HÀNG\n";
-            cout << "  Mã khách hàng: " << kh.layMaKhachHang() << "\n";
-            cout << "  Họ tên: " << kh.layHoTen() << "\n";
-            cout << "  Số điện thoại: " << kh.laySoDienThoai() << "\n";
-            cout << "  Địa chỉ: " << kh.layDiaChi() << "\n";
-            cout << "  Điểm tích lũy: " << kh.layDiemTichLuy() << "\n";
-            cout << "  Trạng thái tài khoản: " << (kh.laDangBiKhoa() ? "Đang khóa" : "Hoạt động") << "\n";
-            cout << "\n  LỊCH SỬ ĐƠN HÀNG ONLINE\n";
-            vector<int> viTriDon = qlDon.layViTriDonCuaKhach(kh.layMaKhachHang());
-            if (viTriDon.empty()) cout << "  Khách hàng chưa có đơn hàng online.\n";
-            for (size_t j = 0; j < viTriDon.size(); ++j)
-            {
-                const DonHangOnline &don = qlDon.layDonTheoViTri(viTriDon[j]);
-                cout << "  " << don.layMaHoaDon() << " | " << don.layNgayTao() << " | ";
-                const vector<ChiTietDonHang> &mon = don.layChiTiet();
-                for (size_t k = 0; k < mon.size(); ++k)
-                {
-                    if (k) cout << ", ";
-                    cout << mon[k].tenMon << " x" << mon[k].soLuong;
-                }
-                cout << " | " << fixed << setprecision(0) << don.layThanhTien() << " VND | "
-                     << don.layTenTrangThaiOnline() << "\n";
-            }
-            dungManHinh();
-        }
-        else if (chon == 3 || chon == 4)
-        {
-            string ma;
-            cout << "\n  Nhập mã khách hàng: ";
-            getline(cin, ma);
-            int viTri = timViTriTheoMa(ma);
-            if (viTri < 0)
-            {
-                cout << "  Không tìm thấy khách hàng có mã này.\n";
-                dungManHinh();
-                continue;
-            }
-            if (chon == 3)
-            {
-                KhachHang &kh = danhSach[viTri];
-                string hoTen, sdt, diaChi;
-                cout << "  Họ tên mới (Enter để giữ nguyên): "; getline(cin, hoTen);
-                cout << "  SĐT mới (Enter để giữ nguyên): "; getline(cin, sdt);
-                cout << "  Địa chỉ mới (Enter để giữ nguyên): "; getline(cin, diaChi);
-                if (!hoTen.empty()) kh.doiHoTen(hoTen);
-                if (!sdt.empty()) kh.datSoDienThoai(sdt);
-                if (!diaChi.empty()) kh.datDiaChi(diaChi);
-                ghiFile();
-                cout << "  Đã cập nhật thông tin khách hàng.\n";
-            }
+            if (danhSach.empty()) cout << "\n  Danh sách khách hàng đang trống.\n";
             else
             {
-                KhachHang &kh = danhSach[viTri];
-                kh.datTaiKhoanBiKhoa(!kh.laDangBiKhoa());
-                ghiFile();
-                cout << (kh.laDangBiKhoa() ? "  Đã khóa tài khoản khách hàng.\n" : "  Đã mở khóa tài khoản khách hàng.\n");
+                cout << "\n  DANH SÁCH KHÁCH HÀNG\n  Mã KH | Họ tên | Số điện thoại | Địa chỉ\n";
+                for (size_t i = 0; i < danhSach.size(); ++i)
+                    cout << "  " << danhSach[i].layMaKhachHang() << " | " << danhSach[i].layHoTen() << " | "
+                         << danhSach[i].laySoDienThoai() << " | " << danhSach[i].layDiaChi() << "\n";
             }
             dungManHinh();
+            continue;
         }
-        else if (chon == 5)
+        if (danhSach.empty()) { cout << "  Danh sách khách hàng đang trống.\n"; dungManHinh(); continue; }
+        vector<string> luaChon;
+        for (size_t i = 0; i < danhSach.size(); ++i)
+            luaChon.push_back(danhSach[i].layMaKhachHang() + " | " + danhSach[i].layHoTen());
+        luaChon.push_back("0. Quay lại");
+        int vt = chonMenuMuiTen("CHỌN KHÁCH HÀNG", luaChon);
+        if (vt == (int)danhSach.size()) continue;
+        const KhachHang &kh = danhSach[vt];
+        QuanLyDonHangOnline qlDon;
+        xoaManHinh();
+        cout << "\n  CHI TIẾT KHÁCH HÀNG\n  Mã khách hàng: " << kh.layMaKhachHang()
+             << "\n  Họ tên: " << kh.layHoTen() << "\n  Số điện thoại: " << kh.laySoDienThoai()
+             << "\n  Địa chỉ: " << kh.layDiaChi() << "\n\n  LỊCH SỬ ĐƠN HÀNG ONLINE\n";
+        vector<int> viTriDon = qlDon.layViTriDonCuaKhach(kh.layMaKhachHang());
+        if (viTriDon.empty()) cout << "  Khách hàng chưa có đơn hàng online.\n";
+        for (size_t j = 0; j < viTriDon.size(); ++j)
         {
-            int biKhoa = 0;
-            for (size_t i = 0; i < danhSach.size(); ++i)
-                if (danhSach[i].laDangBiKhoa()) ++biKhoa;
-            cout << "\n  Tổng số khách hàng: " << danhSach.size() << "\n";
-            cout << "  Tài khoản đang bị khóa: " << biKhoa << "\n";
-            dungManHinh();
+            const DonHangOnline &don = qlDon.layDonTheoViTri(viTriDon[j]);
+            cout << "  " << don.layMaHoaDon() << " | " << don.layNgayTao() << " | ";
+            const vector<ChiTietDonHang> &mon = don.layChiTiet();
+            for (size_t k = 0; k < mon.size(); ++k) { if (k) cout << ", "; cout << mon[k].tenMon << " x" << mon[k].soLuong; }
+            cout << " | " << fixed << setprecision(0) << don.layThanhTien() << " VND | " << don.layTenTrangThaiOnline() << "\n";
         }
+        dungManHinh();
     }
 }

@@ -16,7 +16,7 @@ NguoiDung::NguoiDung()
     tenDangNhap = "";
     matKhau = "";
     hoTen = "";
-    vaiTro = THU_NGAN;
+    vaiTro = PHUC_VU;
 }
 
 NguoiDung::NguoiDung(string tenDangNhap, string matKhau, string hoTen, VaiTro vaiTro)
@@ -40,7 +40,6 @@ VaiTro NguoiDung::layVaiTro() const { return vaiTro; }
 string NguoiDung::layTenVaiTro() const
 {
     if (vaiTro == QUAN_LY) return "QUẢN LÝ";
-    if (vaiTro == THU_NGAN) return "THU NGÂN";
     if (vaiTro == KHACH_HANG) return "KHÁCH HÀNG";
     return "PHỤC VỤ";
 }
@@ -104,8 +103,8 @@ bool QuanLyDangNhap::dangNhap(const string &tenDangNhap, const string &matKhau, 
                     return false;
                 }
 
-                if (vaiTroFile < QUAN_LY || vaiTroFile > PHUC_VU)
-                    vaiTroFile = PHUC_VU;
+                if (vaiTroFile == 3) vaiTroFile = PHUC_VU;
+                if (vaiTroFile < QUAN_LY || vaiTroFile > PHUC_VU) vaiTroFile = PHUC_VU;
 
                 nguoiDungRaKQ = NguoiDung(tdnFile, mkFile, hoTenFile, (VaiTro)vaiTroFile);
                 f.close();

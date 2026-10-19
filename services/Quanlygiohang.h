@@ -6,7 +6,6 @@
 #include "QuanLyBanHang.h" // ChiTietDonHang (tai su dung)
 #include "QuanLyMonAn.h"
 #include "Quanlykhachhang.h"
-#include "Quanlymagiamgia.h"
 
 using namespace std;
 
@@ -21,8 +20,6 @@ class GioHang
 private:
     string maKhachHang;
     vector<ChiTietDonHang> chiTiet;
-    string maGiamGiaApDung;
-    double soTienGiam;
 
 public:
     GioHang();
@@ -32,19 +29,16 @@ public:
     const vector<ChiTietDonHang> &layChiTiet() const;
 
     double layTamTinh() const;          // tong truoc giam gia
-    double laySoTienGiam() const;
-    double layThanhTien() const;        // tamTinh - soTienGiam
-    string layMaGiamGiaApDung() const;
+    double layThanhTien() const;
 
     void themMon(const MonAn &mon, int soLuong);
     bool suaSoLuong(const string &maMon, int soLuongMoi);
     bool xoaMon(const string &maMon);
     bool rong() const;
 
-    void apDungGiamGia(const string &maCode, double soTien);
     void lamMoi(); // xoa sach gio hang sau khi dat hang thanh cong
 
-    // Dinh dang: maKhachHang|maGiamGia|soTienGiam|ma~ten~gia~sl;...
+    // Dinh dang: maKhachHang||0|ma~ten~gia~sl;...
     string chuyenThanhDong() const;
     void docTuDong(const string &dong);
 };
@@ -56,7 +50,6 @@ class QuanLyGioHang
 private:
     vector<GioHang> danhSachGio;
     QuanLyMonAn qlMonAn;
-    QuanLyMaGiamGia qlMaGiamGia;
 
     GioHang &layGioCuaKhach(const string &maKhachHang);
     void docFile();

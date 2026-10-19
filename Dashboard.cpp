@@ -6,7 +6,6 @@
 #include "services/Quanlykhachhang.h"
 #include "services/Quanlygiohang.h"
 #include "services/Quanlydonhangonline.h"
-#include "services/Quanlydanhgia.h"
 #include "utils/Utils.h"
 #include <iostream>
 using namespace std;
@@ -74,23 +73,15 @@ void Dashboard::menuQuanLy(const NguoiDung &nguoiDung)
     }
 }
 
-void Dashboard::menuThuNgan(const NguoiDung &nguoiDung)
+void Dashboard::menuPhucVu(const NguoiDung &nguoiDung)
 {
     while (true)
     {
-        vector<string> dsMenu = {
-            "1. Bán hàng",
-            "2. Xem thực đơn",
-            "3. Quản lý khách hàng (đang phát triển)",
-            "4. Xem hóa đơn (đang phát triển)",
-            "0. Đăng xuất"
-        };
-
-        string tieuDe = "MENU THU NGÂN — Xin chào, " + nguoiDung.layHoTen() +
-                         " (" + nguoiDung.layTenVaiTro() + ")";
+        vector<string> dsMenu = {"1. Bán hàng", "2. Xem thực đơn", "0. Đăng xuất"};
+        string tieuDe = "MENU PHỤC VỤ — Xin chào, " + nguoiDung.layHoTen() +
+                        " (" + nguoiDung.layTenVaiTro() + ")";
         int vtChon = chonMenuMuiTen(tieuDe, dsMenu);
         string muc = dsMenu[vtChon];
-
         if (muc.find("Bán hàng") != string::npos)
         {
             QuanLyBanHang qlBanHang;
@@ -101,25 +92,7 @@ void Dashboard::menuThuNgan(const NguoiDung &nguoiDung)
             QuanLyMonAn qlMonAn;
             qlMonAn.hienThiMenu(nguoiDung);
         }
-        else if (muc.find("khách hàng") != string::npos)
-        {
-            xoaManHinh();
-            cout << "\nChức năng quản lý khách hàng đang được phát triển.\n";
-            dungManHinh();
-        }
-        else if (muc.find("hóa đơn") != string::npos)
-        {
-            xoaManHinh();
-            cout << "\nChức năng xem hóa đơn đang được phát triển.\n";
-            dungManHinh();
-        }
-        else if (muc.find("Đăng xuất") != string::npos)
-        {
-            xoaManHinh();
-            cout << "\nĐã đăng xuất. Hẹn gặp lại!\n";
-            dungManHinh();
-            return;
-        }
+        else return;
     }
 }
 
@@ -127,7 +100,6 @@ void Dashboard::menuKhachHang(const KhachHang &khachHang)
 {
     QuanLyGioHang qlGioHang;
     QuanLyDonHangOnline qlDonOnline;
-    QuanLyDanhGia qlDanhGia;
     QuanLyKhachHang qlKhachHang;
 
     while (true)
@@ -136,8 +108,7 @@ void Dashboard::menuKhachHang(const KhachHang &khachHang)
             "1. 🍽️ Xem thực đơn & đặt món",
             "2. 🛒 Giỏ hàng của tôi",
             "3. 📦 Đơn hàng của tôi",
-            "4. ⭐ Đánh giá món ăn",
-            "5. 👤 Thông tin tài khoản",
+            "4. 👤 Thông tin tài khoản",
             "0. 🚪 Đăng xuất"
         };
 
@@ -156,10 +127,6 @@ void Dashboard::menuKhachHang(const KhachHang &khachHang)
         else if (muc.find("Đơn hàng của tôi") != string::npos)
         {
             qlDonOnline.xemDonHangCuaToi(khachHang);
-        }
-        else if (muc.find("Đánh giá") != string::npos)
-        {
-            qlDanhGia.menuDanhGia(khachHang, qlDonOnline);
         }
         else if (muc.find("Thông tin tài khoản") != string::npos)
         {
@@ -203,7 +170,7 @@ void Dashboard::chay()
         }
         else
         {
-            menuThuNgan(nguoiDung);
+            menuPhucVu(nguoiDung);
         }
 
         vector<string> dsThoat = {

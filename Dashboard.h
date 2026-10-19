@@ -8,7 +8,7 @@ class Dashboard
 {
 private:
     void menuQuanLy(const NguoiDung &nguoiDung);
-    void menuThuNgan(const NguoiDung &nguoiDung);
+    void menuPhucVu(const NguoiDung &nguoiDung);
     void menuKhachHang(const KhachHang &khachHang);
 
 public:

@@ -28,6 +28,7 @@ private:
     string loaiMon;
     double gia;
     int trangThai;
+    int soLuongBan;
     string donViTinh;
     string moTa;
     int kieuMon;
@@ -44,6 +45,7 @@ public:
     string layLoaiMon() const;
     double layGia() const;
     int layTrangThai() const;
+    int laySoLuongBan() const;
     string layTenTrangThai() const;
     bool laConBan() const;
     string layDonViTinh() const;
@@ -59,6 +61,7 @@ public:
     void datLoaiMon(string loai);
     void datGia(double giaMoi);
     void datTrangThai(int trangThaiMoi);
+    void datSoLuongBan(int soLuong);
     void datDonViTinh(string donVi);
     void datMoTa(string mt);
     void datKieuMon(int kieu);
@@ -84,7 +87,6 @@ private:
     bool kiemTraMaTonTai(string maMon) const;
     void nhapNguyenLieu(MonAn &mon);
     void nhapThanhPhanNhom(MonAn &mon);
-    void nhapTuyChonPhucVu(MonAn &mon);
 
     // Cac ham noi bo cho luong giao dien moi
     vector<int> locTheoNhom(const string &nhom) const; // tra ve vi tri cac mon khop nhom, "" = tat ca
@@ -101,8 +103,6 @@ public:
     void xoaMon();
     void timKiemTheoTen() const;
     void xemDanhSach() const;
-    void quanLyMonTheoNhom();
-    void quanLySoThichPhucVu();
     void thongKeMon() const;
 
     void docFile();
@@ -111,6 +111,7 @@ public:
     // Cung cap danh sach mon cho cac nghiep vu khac (ban hang, bao cao...)
     // Du lieu chi doc, viec sua mon van phai thong qua QuanLyMonAn.
     const vector<MonAn> &layDanhSachMonAn() const;
+    bool capNhatSoLuongBan(const string &maMon, int thayDoi);
 
     void hienThiMenu(const NguoiDung &nguoiDung);
 };

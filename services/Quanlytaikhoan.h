@@ -10,9 +10,8 @@ using namespace std;
 enum VaiTro
 {
     QUAN_LY = 1,
-    THU_NGAN = 2,
-    PHUC_VU = 3,
-    KHACH_HANG = 4
+    PHUC_VU = 2,
+    KHACH_HANG = 3
 };
 
 // ============================================================

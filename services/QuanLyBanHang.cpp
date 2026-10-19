@@ -1,5 +1,6 @@
 #include "QuanLyBanHang.h"
 #include "QuanLyTaiChinh.h"
+#include "Quanlydonhangonline.h"
 #include "../utils/Utils.h"
 #include <algorithm>
 #include <ctime>
@@ -267,13 +268,13 @@ void QuanLyBanHang::taoDonHang(const NguoiDung &nguoiDung)
     {
         vector<string> luaChon;
         for (size_t i = 0; i < dsMon.size(); ++i)
-            if (dsMon[i].laConBan()) luaChon.push_back(dsMon[i].layTenMon() + " | " + to_string((long long)dsMon[i].layGia()) + " VND");
+            if (dsMon[i].laConBan() && dsMon[i].laySoLuongBan() > 0) luaChon.push_back(dsMon[i].layTenMon() + " | " + to_string((long long)dsMon[i].layGia()) + " VND | Còn: " + to_string(dsMon[i].laySoLuongBan()));
         luaChon.push_back("✓ Hoàn tất tạo đơn");
         if (luaChon.size() == 1) { xoaManHinh(); cout << "\n  ⚠ Không có món đang bán.\n"; dungManHinh(); return; }
         int chon = chonMenuMuiTen("TẠO ĐƠN HÀNG — CHỌN MÓN", luaChon);
         if (chon == (int)luaChon.size() - 1) break;
         vector<const MonAn*> monDangBan;
-        for (size_t i = 0; i < dsMon.size(); ++i) if (dsMon[i].laConBan()) monDangBan.push_back(&dsMon[i]);
+        for (size_t i = 0; i < dsMon.size(); ++i) if (dsMon[i].laConBan() && dsMon[i].laySoLuongBan() > 0) monDangBan.push_back(&dsMon[i]);
         int soLuong;
         xoaManHinh();
         cout << "\n  Số lượng " << monDangBan[chon]->layTenMon()
@@ -293,12 +294,24 @@ void QuanLyBanHang::taoDonHang(const NguoiDung &nguoiDung)
         }
         else
         {
+            int daTrongDon = 0;
+            for (size_t i = 0; i < don.layChiTiet().size(); ++i)
+                if (don.layChiTiet()[i].maMon == monDangBan[chon]->layMaMon()) daTrongDon = don.layChiTiet()[i].soLuong;
+            if (soLuong + daTrongDon > monDangBan[chon]->laySoLuongBan())
+            {
+                cout << "  ⚠ Chỉ còn " << monDangBan[chon]->laySoLuongBan() - daTrongDon << " món có thể thêm.\n";
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                dungManHinh();
+                continue;
+            }
             don.themMon(*monDangBan[chon], soLuong);
             // Bỏ ký tự Enter còn lại để menu mũi tên chờ thao tác tiếp theo.
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
     }
     if (don.rong()) { xoaManHinh(); cout << "\n  Đơn hàng chưa có món nên không được lưu.\n"; dungManHinh(); return; }
+    for (size_t i = 0; i < don.layChiTiet().size(); ++i)
+        qlMonAn.capNhatSoLuongBan(don.layChiTiet()[i].maMon, -don.layChiTiet()[i].soLuong);
     danhSachHoaDon.push_back(don); ghiFile(); xoaManHinh(); cout << "\n  ✅ Đã tạo đơn hàng ở trạng thái đơn nháp.\n"; don.hienThiChiTiet(); dungManHinh();
 }
 
@@ -353,6 +366,14 @@ void QuanLyBanHang::huyDonHang()
 
 void QuanLyBanHang::thanhToanDonHang()
 {
+    vector<string> loaiDon = {"1. Đơn tại quầy", "2. Đơn online đã xác nhận", "0. Quay lại"};
+    int loai = chonMenuMuiTen("CHỌN ĐƠN CẦN THANH TOÁN", loaiDon);
+    if (loai == 2) return;
+    if (loai == 1)
+    {
+        QuanLyDonHangOnline().thanhToanDonDaXacNhan();
+        return;
+    }
     int vt = chonDonNhap("💳 THANH TOÁN — CHỌN ĐƠN CẦN THANH TOÁN");
     if (vt < 0) return;
     if (danhSachHoaDon[vt].rong()) { cout << "  ⚠ Đơn hàng không hợp lệ.\n"; dungManHinh(); return; }

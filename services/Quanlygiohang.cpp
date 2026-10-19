@@ -12,7 +12,7 @@ using namespace std;
 // ============================================================
 // GIOHANG
 // ============================================================
-GioHang::GioHang() : soTienGiam(0) {}
+GioHang::GioHang() {}
 
 void GioHang::datMaKhachHang(const string &ma) { maKhachHang = ma; }
 string GioHang::layMaKhachHang() const { return maKhachHang; }
@@ -25,9 +25,7 @@ double GioHang::layTamTinh() const
     return tong;
 }
 
-double GioHang::laySoTienGiam() const { return soTienGiam; }
-double GioHang::layThanhTien() const { return layTamTinh() - soTienGiam; }
-string GioHang::layMaGiamGiaApDung() const { return maGiamGiaApDung; }
+double GioHang::layThanhTien() const { return layTamTinh(); }
 
 void GioHang::themMon(const MonAn &mon, int soLuong)
 {
@@ -66,23 +64,15 @@ bool GioHang::xoaMon(const string &maMon)
 
 bool GioHang::rong() const { return chiTiet.empty(); }
 
-void GioHang::apDungGiamGia(const string &maCode, double soTien)
-{
-    maGiamGiaApDung = maCode;
-    soTienGiam = soTien;
-}
-
 void GioHang::lamMoi()
 {
     chiTiet.clear();
-    maGiamGiaApDung = "";
-    soTienGiam = 0;
 }
 
 string GioHang::chuyenThanhDong() const
 {
     ostringstream oss;
-    oss << maKhachHang << "|" << maGiamGiaApDung << "|" << fixed << setprecision(0) << soTienGiam << "|";
+    oss << maKhachHang << "||0|";
     for (size_t i = 0; i < chiTiet.size(); i++)
     {
         if (i) oss << ";";
@@ -100,8 +90,6 @@ void GioHang::docTuDong(const string &dong)
     if (truong.size() < 3) return;
 
     maKhachHang = truong[0];
-    maGiamGiaApDung = truong[1];
-    soTienGiam = atof(truong[2].c_str());
     chiTiet.clear();
 
     if (truong.size() >= 4 && !truong[3].empty())
@@ -206,7 +194,8 @@ void QuanLyGioHang::manHinhChonMonTheoNhom(GioHang &gio, const string &nhom)
             if (!nhom.empty() && dsMon[i].layLoaiMon() != nhom) continue;
             monTrongNhom.push_back(&dsMon[i]);
             luaChon.push_back(dsMon[i].layMaMon() + " | " + dsMon[i].layTenMon() + " | "
-                             + to_string((long long)dsMon[i].layGia()) + " VND");
+                             + to_string((long long)dsMon[i].layGia()) + " VND | Còn: "
+                             + to_string(dsMon[i].laySoLuongBan()));
         }
 
         if (luaChon.empty())
@@ -229,7 +218,8 @@ void QuanLyGioHang::manHinhChonMonTheoNhom(GioHang &gio, const string &nhom)
         cout << "  ════════════════════════════════════════════════════\n\n";
         cout << "  Món    : " << monChon->layTenMon() << "\n";
         cout << "  Mã món : " << monChon->layMaMon() << "\n";
-        cout << "  Giá    : " << fixed << setprecision(0) << monChon->layGia() << " VND\n\n";
+        cout << "  Giá    : " << fixed << setprecision(0) << monChon->layGia() << " VND\n";
+        cout << "  Số lượng đang bán: " << monChon->laySoLuongBan() << "\n\n";
         cout << "  Nhập số lượng (0 để hủy): ";
 
         int soLuong;
@@ -244,7 +234,11 @@ void QuanLyGioHang::manHinhChonMonTheoNhom(GioHang &gio, const string &nhom)
         }
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         if (soLuong == 0) continue;
-
+        int daTrongGio = 0;
+        for (size_t i = 0; i < gio.layChiTiet().size(); ++i)
+            if (gio.layChiTiet()[i].maMon == monChon->layMaMon()) daTrongGio = gio.layChiTiet()[i].soLuong;
+        if (soLuong + daTrongGio > monChon->laySoLuongBan())
+        { cout << "\n  ⚠ Chỉ còn " << monChon->laySoLuongBan() - daTrongGio << " món có thể thêm.\n"; dungManHinh(); continue; }
         gio.themMon(*monChon, soLuong);
         xoaManHinh();
         cout << "\n  ✅ Đã thêm: " << monChon->layTenMon() << " x" << soLuong
@@ -276,25 +270,14 @@ void QuanLyGioHang::xemGioHang(const KhachHang &khachHang, QuanLyDonHangOnline &
                     << "   " << chiTiet[i].donGia << " = " << chiTiet[i].thanhTien() << "\n";
             oss << "  ────────────────────────────────────────────────────\n";
             oss << "  TẠM TÍNH: " << gio.layTamTinh() << " VND\n";
-            if (!gio.layMaGiamGiaApDung().empty())
-            {
-                oss << "  Mã giảm giá: " << gio.layMaGiamGiaApDung() << "   -" << gio.laySoTienGiam() << "\n";
-                oss << "  THÀNH TIỀN: " << gio.layThanhTien() << " VND\n";
-            }
+
         }
         oss << "  ════════════════════════════════════════════════════\n";
 
-        vector<string> dsThaoTac = {
-            "1. ➕ Thêm món",
-            "2. ✏️ Sửa số lượng",
-            "3. 🗑️ Xóa món",
-            "4. 🎟️ Nhập mã giảm giá",
-            "5. 📦 Tiến hành đặt hàng",
-            "0. ⬅️ Quay lại"
-        };
+        vector<string> dsThaoTac = {"1. ➕ Thêm món", "2. ✏️ Sửa số lượng", "3. 🗑️ Xóa món", "4. 📦 Tiến hành đặt hàng", "0. ⬅️ Quay lại"};
         int vtChon = chonMenuMuiTen("💡 THAO TÁC GIỎ HÀNG", dsThaoTac, 0, true, oss.str());
 
-        if (vtChon == -1 || vtChon == 5)
+        if (vtChon == -1 || vtChon == 4)
         {
             ghiFile();
             return;
@@ -337,8 +320,10 @@ void QuanLyGioHang::xemGioHang(const KhachHang &khachHang, QuanLyDonHangOnline &
                 else
                 {
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                    gio.suaSoLuong(maMon, sl);
-                    cout << "\n  ✅ Đã cập nhật giỏ hàng.\n";
+                    int conBan = -1;
+                    for (size_t k = 0; k < qlMonAn.layDanhSachMonAn().size(); ++k) if (qlMonAn.layDanhSachMonAn()[k].layMaMon() == maMon) conBan = qlMonAn.layDanhSachMonAn()[k].laySoLuongBan();
+                    if (sl > conBan) cout << "\n  ⚠ Số lượng đang bán chỉ còn " << conBan << ".\n";
+                    else { gio.suaSoLuong(maMon, sl); cout << "\n  ✅ Đã cập nhật giỏ hàng.\n"; }
                 }
                 dungManHinh();
             }
@@ -374,44 +359,6 @@ void QuanLyGioHang::xemGioHang(const KhachHang &khachHang, QuanLyDonHangOnline &
             }
         }
         else if (vtChon == 3)
-        {
-            if (gio.rong())
-            {
-                xoaManHinh();
-                cout << "\n  ⚠ Giỏ hàng trống.\n";
-                dungManHinh();
-                continue;
-            }
-            xoaManHinh();
-            cout << "\n  ════════════════════════════════════════════════════\n";
-            cout << "  🎟️ NHẬP MÃ GIẢM GIÁ\n";
-            cout << "  ════════════════════════════════════════════════════\n\n";
-            cout << "  Tổng tiền hiện tại: " << fixed << setprecision(0) << gio.layTamTinh() << " VND\n\n";
-            cout << "  Nhập mã (Enter để bỏ qua): ";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            string ma;
-            getline(cin, ma);
-            if (ma.empty()) continue;
-
-            double soTienGiam;
-            string loi;
-            if (qlMaGiamGia.apDungMa(ma, gio.layTamTinh(), soTienGiam, loi))
-            {
-                gio.apDungGiamGia(ma, soTienGiam);
-                xoaManHinh();
-                cout << "\n  ✓ Áp dụng mã " << ma << " thành công!\n";
-                cout << "    Giảm giá : -" << fixed << setprecision(0) << soTienGiam << " VND\n";
-                cout << "  ────────────────────────────────────────────────────\n";
-                cout << "  THÀNH TIỀN: " << gio.layThanhTien() << " VND\n";
-            }
-            else
-            {
-                xoaManHinh();
-                cout << "\n  ❌ " << loi << "\n";
-            }
-            dungManHinh();
-        }
-        else if (vtChon == 4)
         {
             if (gio.rong())
             {
@@ -492,8 +439,6 @@ void QuanLyGioHang::tienHanhDatHang(const KhachHang &khachHang, GioHang &gio, Qu
                   << "   " << chiTiet[i].thanhTien() << "\n";
         ossXN << "  ────────────────────────────────────────────────────\n";
         ossXN << "  Tạm tính   : " << gio.layTamTinh() << "\n";
-        if (!gio.layMaGiamGiaApDung().empty())
-            ossXN << "  Mã giảm giá: " << gio.layMaGiamGiaApDung() << "   -" << gio.laySoTienGiam() << "\n";
         ossXN << "  ────────────────────────────────────────────────────\n";
         ossXN << "  THÀNH TIỀN : " << gio.layThanhTien() << " VND\n";
         ossXN << "  ════════════════════════════════════════════════════\n";
@@ -502,8 +447,18 @@ void QuanLyGioHang::tienHanhDatHang(const KhachHang &khachHang, GioHang &gio, Qu
         int xn = chonMenuMuiTen("", dsXn, 0, false, ossXN.str());
         if (xn == 1) continue; // huy, quay lai man hinh sua thong tin
 
+        bool conDuHang = true;
+        for (size_t i = 0; i < chiTiet.size(); ++i)
+        {
+            int con = -1;
+            for (size_t j = 0; j < qlMonAn.layDanhSachMonAn().size(); ++j)
+                if (qlMonAn.layDanhSachMonAn()[j].layMaMon() == chiTiet[i].maMon) con = qlMonAn.layDanhSachMonAn()[j].laySoLuongBan();
+            if (chiTiet[i].soLuong > con) { conDuHang = false; cout << "\n  ⚠ " << chiTiet[i].tenMon << " chỉ còn " << con << " món.\n"; }
+        }
+        if (!conDuHang) { dungManHinh(); continue; }
         double thanhTienCuoi = gio.layThanhTien();
         string maDon = qlDonOnline.taoDonHang(khachHang, gio, diaChi, ghiChu);
+        for (size_t i = 0; i < chiTiet.size(); ++i) qlMonAn.capNhatSoLuongBan(chiTiet[i].maMon, -chiTiet[i].soLuong);
         gio.lamMoi();
         ghiFile();
 
