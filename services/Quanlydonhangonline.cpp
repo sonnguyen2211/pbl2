@@ -188,6 +188,10 @@ void QuanLyDonHangOnline::xemChiTietVaHuyDon(int viTri)
             int xn = chonMenuMuiTen("⚠️ XÁC NHẬN HỦY ĐƠN HÀNG — " + don.layMaHoaDon(), dsXn);
             if (xn == 0)
             {
+                QuanLyMonAn qlMonAn;
+                const vector<ChiTietDonHang> &mon = don.layChiTiet();
+                for (size_t i = 0; i < mon.size(); ++i)
+                    qlMonAn.capNhatSoLuongBan(mon[i].maMon, mon[i].soLuong);
                 don.datTrangThai(DA_HUY_ONLINE);
                 ghiFile();
                 xoaManHinh();

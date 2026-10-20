@@ -349,6 +349,17 @@ void QuanLyBanHang::suaDonHang()
             dungManHinh();
             continue;
         }
+        int slCu = 0;
+        for (size_t i = 0; i < chiTiet.size(); ++i)
+            if (chiTiet[i].maMon == maMon) slCu = chiTiet[i].soLuong;
+        int thayDoiKho = slCu - sl;
+        if (thayDoiKho < 0 && !qlMonAn.capNhatSoLuongBan(maMon, thayDoiKho))
+        {
+            cout << "  ⚠ Không đủ số lượng đang bán để tăng món này.\n";
+            dungManHinh();
+            continue;
+        }
+        if (thayDoiKho > 0) qlMonAn.capNhatSoLuongBan(maMon, thayDoiKho);
         danhSachHoaDon[vt].suaSoLuong(maMon, sl);
         // Tránh Enter của ô số lượng tự động chọn món đầu tiên ở vòng lặp kế tiếp.
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -361,6 +372,9 @@ void QuanLyBanHang::huyDonHang()
 {
     int vt = chonDonNhap("🗑️ HỦY ĐƠN HÀNG — CHỌN ĐƠN CẦN HỦY");
     if (vt < 0) return;
+    const vector<ChiTietDonHang> &mon = danhSachHoaDon[vt].layChiTiet();
+    for (size_t i = 0; i < mon.size(); ++i)
+        qlMonAn.capNhatSoLuongBan(mon[i].maMon, mon[i].soLuong);
     danhSachHoaDon[vt].datTrangThai(DA_HUY); ghiFile(); cout << "  ✅ Đã hủy đơn hàng.\n"; dungManHinh();
 }
 

@@ -20,12 +20,15 @@ class GioHang
 private:
     string maKhachHang;
     vector<ChiTietDonHang> chiTiet;
+    bool daGiuKho;
 
 public:
     GioHang();
 
     void datMaKhachHang(const string &ma);
     string layMaKhachHang() const;
+    bool layDaGiuKho() const;
+    void datDaGiuKho(bool daGiu);
     const vector<ChiTietDonHang> &layChiTiet() const;
 
     double layTamTinh() const;          // tong truoc giam gia
@@ -57,6 +60,7 @@ private:
 
     void manHinhChonMonTheoNhom(GioHang &gio, const string &nhom);
     void tienHanhDatHang(const KhachHang &khachHang, GioHang &gio, QuanLyDonHangOnline &qlDonOnline);
+    bool giuKhoChoGio(GioHang &gio);
 
 public:
     QuanLyGioHang();

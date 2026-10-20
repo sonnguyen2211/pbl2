@@ -12,10 +12,12 @@ using namespace std;
 // ============================================================
 // GIOHANG
 // ============================================================
-GioHang::GioHang() {}
+GioHang::GioHang() : daGiuKho(false) {}
 
 void GioHang::datMaKhachHang(const string &ma) { maKhachHang = ma; }
 string GioHang::layMaKhachHang() const { return maKhachHang; }
+bool GioHang::layDaGiuKho() const { return daGiuKho; }
+void GioHang::datDaGiuKho(bool daGiu) { daGiuKho = daGiu; }
 const vector<ChiTietDonHang> &GioHang::layChiTiet() const { return chiTiet; }
 
 double GioHang::layTamTinh() const
@@ -67,12 +69,13 @@ bool GioHang::rong() const { return chiTiet.empty(); }
 void GioHang::lamMoi()
 {
     chiTiet.clear();
+    daGiuKho = false;
 }
 
 string GioHang::chuyenThanhDong() const
 {
     ostringstream oss;
-    oss << maKhachHang << "||0|";
+    oss << maKhachHang << "|" << (daGiuKho ? "R" : "U") << "|0|";
     for (size_t i = 0; i < chiTiet.size(); i++)
     {
         if (i) oss << ";";
@@ -90,6 +93,7 @@ void GioHang::docTuDong(const string &dong)
     if (truong.size() < 3) return;
 
     maKhachHang = truong[0];
+    daGiuKho = truong.size() >= 4 && truong[1] == "R";
     chiTiet.clear();
 
     if (truong.size() >= 4 && !truong[3].empty())
@@ -131,9 +135,31 @@ void QuanLyGioHang::docFile()
         GioHang gio;
         gio.docTuDong(dong);
         if (!gio.layMaKhachHang().empty())
+        {
+            if (!gio.layDaGiuKho()) giuKhoChoGio(gio);
             danhSachGio.push_back(gio);
+        }
     }
     f.close();
+    ghiFile();
+}
+
+bool QuanLyGioHang::giuKhoChoGio(GioHang &gio)
+{
+    if (gio.layDaGiuKho()) return true;
+    const vector<ChiTietDonHang> &mon = gio.layChiTiet();
+    const vector<MonAn> &dsMon = qlMonAn.layDanhSachMonAn();
+    for (size_t i = 0; i < mon.size(); ++i)
+    {
+        bool duHang = false;
+        for (size_t j = 0; j < dsMon.size(); ++j)
+            if (dsMon[j].layMaMon() == mon[i].maMon && dsMon[j].laySoLuongBan() >= mon[i].soLuong) duHang = true;
+        if (!duHang) return false;
+    }
+    for (size_t i = 0; i < mon.size(); ++i)
+        qlMonAn.capNhatSoLuongBan(mon[i].maMon, -mon[i].soLuong);
+    gio.datDaGiuKho(true);
+    return true;
 }
 
 void QuanLyGioHang::ghiFile() const
@@ -191,6 +217,7 @@ void QuanLyGioHang::manHinhChonMonTheoNhom(GioHang &gio, const string &nhom)
         for (size_t i = 0; i < dsMon.size(); i++)
         {
             if (!dsMon[i].laConBan()) continue;
+            if (dsMon[i].laySoLuongBan() <= 0) continue;
             if (!nhom.empty() && dsMon[i].layLoaiMon() != nhom) continue;
             monTrongNhom.push_back(&dsMon[i]);
             luaChon.push_back(dsMon[i].layMaMon() + " | " + dsMon[i].layTenMon() + " | "
@@ -234,11 +261,20 @@ void QuanLyGioHang::manHinhChonMonTheoNhom(GioHang &gio, const string &nhom)
         }
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         if (soLuong == 0) continue;
-        int daTrongGio = 0;
-        for (size_t i = 0; i < gio.layChiTiet().size(); ++i)
-            if (gio.layChiTiet()[i].maMon == monChon->layMaMon()) daTrongGio = gio.layChiTiet()[i].soLuong;
-        if (soLuong + daTrongGio > monChon->laySoLuongBan())
-        { cout << "\n  ⚠ Chỉ còn " << monChon->laySoLuongBan() - daTrongGio << " món có thể thêm.\n"; dungManHinh(); continue; }
+        if (!giuKhoChoGio(gio))
+        {
+            cout << "\n  ⚠ Giỏ hàng hiện có món không còn đủ tồn kho. Vui lòng điều chỉnh giỏ hàng trước.\n";
+            dungManHinh();
+            continue;
+        }
+        if (soLuong > monChon->laySoLuongBan())
+        { cout << "\n  ⚠ Chỉ còn " << monChon->laySoLuongBan() << " món có thể thêm.\n"; dungManHinh(); continue; }
+        if (!qlMonAn.capNhatSoLuongBan(monChon->layMaMon(), -soLuong))
+        {
+            cout << "\n  ⚠ Số lượng món vừa thay đổi, vui lòng chọn lại.\n";
+            dungManHinh();
+            continue;
+        }
         gio.themMon(*monChon, soLuong);
         xoaManHinh();
         cout << "\n  ✅ Đã thêm: " << monChon->layTenMon() << " x" << soLuong
@@ -320,10 +356,35 @@ void QuanLyGioHang::xemGioHang(const KhachHang &khachHang, QuanLyDonHangOnline &
                 else
                 {
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    int slCu = 0;
+                    for (size_t k = 0; k < chiTiet.size(); ++k) if (chiTiet[k].maMon == maMon) slCu = chiTiet[k].soLuong;
+                    int thayDoi = sl - slCu;
                     int conBan = -1;
-                    for (size_t k = 0; k < qlMonAn.layDanhSachMonAn().size(); ++k) if (qlMonAn.layDanhSachMonAn()[k].layMaMon() == maMon) conBan = qlMonAn.layDanhSachMonAn()[k].laySoLuongBan();
-                    if (sl > conBan) cout << "\n  ⚠ Số lượng đang bán chỉ còn " << conBan << ".\n";
-                    else { gio.suaSoLuong(maMon, sl); cout << "\n  ✅ Đã cập nhật giỏ hàng.\n"; }
+                    for (size_t k = 0; k < qlMonAn.layDanhSachMonAn().size(); ++k)
+                        if (qlMonAn.layDanhSachMonAn()[k].layMaMon() == maMon)
+                            conBan = qlMonAn.layDanhSachMonAn()[k].laySoLuongBan();
+                    if (gio.layDaGiuKho() && thayDoi > conBan)
+                        cout << "\n  ⚠ Số lượng bán còn lại không đủ để tăng món này.\n";
+                    else
+                    {
+                        bool daCapNhatKho = true;
+                        if (gio.layDaGiuKho())
+                        {
+                            if (thayDoi > 0) daCapNhatKho = qlMonAn.capNhatSoLuongBan(maMon, -thayDoi);
+                            else if (thayDoi < 0) daCapNhatKho = qlMonAn.capNhatSoLuongBan(maMon, -thayDoi);
+                        }
+                        if (daCapNhatKho)
+                        {
+                            gio.suaSoLuong(maMon, sl);
+                            if (!gio.layDaGiuKho() && !giuKhoChoGio(gio) && sl > 0 && thayDoi >= 0)
+                            {
+                                gio.suaSoLuong(maMon, slCu);
+                                cout << "\n  ⚠ Tồn kho không đủ để giữ số lượng mới.\n";
+                            }
+                            else cout << "\n  ✅ Đã cập nhật giỏ hàng.\n";
+                        }
+                        else cout << "\n  ⚠ Số lượng món vừa thay đổi, vui lòng thử lại.\n";
+                    }
                 }
                 dungManHinh();
             }
@@ -351,7 +412,12 @@ void QuanLyGioHang::xemGioHang(const KhachHang &khachHang, QuanLyDonHangOnline &
                 int xn = chonMenuMuiTen("⚠️ Xác nhận xóa \"" + tenMon + "\" khỏi giỏ?", dsXn);
                 if (xn == 0)
                 {
+                    int slTraLai = 0;
+                    for (size_t i = 0; i < chiTiet.size(); ++i)
+                        if (chiTiet[i].maMon == maMon) slTraLai = chiTiet[i].soLuong;
+                    if (gio.layDaGiuKho()) qlMonAn.capNhatSoLuongBan(maMon, slTraLai);
                     gio.xoaMon(maMon);
+                    if (!gio.rong() && !gio.layDaGiuKho()) giuKhoChoGio(gio);
                     xoaManHinh();
                     cout << "\n  ✅ Đã xóa " << tenMon << " khỏi giỏ!\n";
                     dungManHinh();
@@ -447,18 +513,14 @@ void QuanLyGioHang::tienHanhDatHang(const KhachHang &khachHang, GioHang &gio, Qu
         int xn = chonMenuMuiTen("", dsXn, 0, false, ossXN.str());
         if (xn == 1) continue; // huy, quay lai man hinh sua thong tin
 
-        bool conDuHang = true;
-        for (size_t i = 0; i < chiTiet.size(); ++i)
+        if (!giuKhoChoGio(gio))
         {
-            int con = -1;
-            for (size_t j = 0; j < qlMonAn.layDanhSachMonAn().size(); ++j)
-                if (qlMonAn.layDanhSachMonAn()[j].layMaMon() == chiTiet[i].maMon) con = qlMonAn.layDanhSachMonAn()[j].laySoLuongBan();
-            if (chiTiet[i].soLuong > con) { conDuHang = false; cout << "\n  ⚠ " << chiTiet[i].tenMon << " chỉ còn " << con << " món.\n"; }
+            cout << "\n  ⚠ Tồn kho không đủ cho giỏ hàng. Vui lòng sửa số lượng món.\n";
+            dungManHinh();
+            continue;
         }
-        if (!conDuHang) { dungManHinh(); continue; }
         double thanhTienCuoi = gio.layThanhTien();
         string maDon = qlDonOnline.taoDonHang(khachHang, gio, diaChi, ghiChu);
-        for (size_t i = 0; i < chiTiet.size(); ++i) qlMonAn.capNhatSoLuongBan(chiTiet[i].maMon, -chiTiet[i].soLuong);
         gio.lamMoi();
         ghiFile();
 
