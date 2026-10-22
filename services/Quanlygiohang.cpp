@@ -457,35 +457,10 @@ void QuanLyGioHang::tienHanhDatHang(const KhachHang &khachHang, GioHang &gio, Qu
         if (!ghiChu.empty()) oss << "  Ghi chú : " << ghiChu << "\n";
         oss << "  ════════════════════════════════════════════════════\n";
 
-        vector<string> ds = {"1. ✏️ Sửa thông tin giao hàng", "2. ✅ Xác nhận đặt hàng", "0. ⬅️ Quay lại"};
+        vector<string> ds = {"1. ✅ Xác nhận đặt hàng", "0. ⬅️ Quay lại"};
         int vt = chonMenuMuiTen("", ds, 0, false, oss.str());
 
-        if (vt == 2) return;
-
-        if (vt == 0)
-        {
-            xoaManHinh();
-            cout << "\n  ════════════════════════════════════════════════════\n";
-            cout << "  ✏️ SỬA THÔNG TIN GIAO HÀNG\n";
-            cout << "  ════════════════════════════════════════════════════\n\n";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            string tam;
-            cout << "  Họ tên mới (Enter để giữ nguyên): ";
-            getline(cin, tam);
-            if (!tam.empty()) hoTen = tam;
-            cout << "  SĐT mới (Enter để giữ nguyên): ";
-            getline(cin, tam);
-            if (!tam.empty()) sdt = tam;
-            cout << "  Địa chỉ mới (Enter để giữ nguyên): ";
-            getline(cin, tam);
-            if (!tam.empty()) diaChi = tam;
-            cout << "  Ghi chú (Enter để giữ nguyên): ";
-            getline(cin, tam);
-            if (!tam.empty()) ghiChu = tam;
-            cout << "\n  ✅ Đã cập nhật thông tin giao hàng!\n";
-            dungManHinh();
-            continue;
-        }
+        if (vt == 1) return;
 
         // vt == 1: xac nhan dat hang -> hien thi tong ket + xac nhan cuoi cung
         const vector<ChiTietDonHang> &chiTiet = gio.layChiTiet();
@@ -498,7 +473,6 @@ void QuanLyGioHang::tienHanhDatHang(const KhachHang &khachHang, GioHang &gio, Qu
         ossXN << "  SĐT        : " << sdt << "\n";
         ossXN << "  Địa chỉ    : " << diaChi << "\n";
         if (!ghiChu.empty()) ossXN << "  Ghi chú    : " << ghiChu << "\n";
-        ossXN << "  Hình thức  : 🛵 Giao hàng tận nhà\n";
         ossXN << "  ────────────────────────────────────────────────────\n";
         for (size_t i = 0; i < chiTiet.size(); i++)
             ossXN << "  " << (i + 1) << ". " << chiTiet[i].tenMon << " x" << chiTiet[i].soLuong
@@ -511,7 +485,7 @@ void QuanLyGioHang::tienHanhDatHang(const KhachHang &khachHang, GioHang &gio, Qu
 
         vector<string> dsXn = {"1. ✅ Xác nhận đặt hàng", "0. ❌ Hủy"};
         int xn = chonMenuMuiTen("", dsXn, 0, false, ossXN.str());
-        if (xn == 1) continue; // huy, quay lai man hinh sua thong tin
+        if (xn == 1) continue;
 
         if (!giuKhoChoGio(gio))
         {

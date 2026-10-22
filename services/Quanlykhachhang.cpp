@@ -309,9 +309,11 @@ void QuanLyKhachHang::hienThiThongTinTaiKhoan(const KhachHang &khachHangHienTai)
             cout << "  ════════════════════════════════════════════════════\n\n";
             cout << "  Tên hiện tại: " << danhSach[viTri].layHoTen() << "\n";
             cout << "  Tên mới     : ";
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             string tenMoi;
             getline(cin, tenMoi);
+            while (!tenMoi.empty() && (tenMoi[tenMoi.size() - 1] == '\r' || tenMoi[tenMoi.size() - 1] == ' ' || tenMoi[tenMoi.size() - 1] == '\t')) tenMoi.erase(tenMoi.size() - 1);
+            size_t dau = tenMoi.find_first_not_of(" \t\r");
+            if (dau != string::npos) tenMoi = tenMoi.substr(dau);
             if (!tenMoi.empty())
             {
                 danhSach[viTri].doiHoTen(tenMoi);
