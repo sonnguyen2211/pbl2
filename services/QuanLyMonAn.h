@@ -13,13 +13,6 @@ enum TrangThaiMon
     NGUNG_KINH_DOANH = 3
 };
 
-enum KieuMon
-{
-    MON_THUONG = 1,
-    MON_THEO_NGUYEN_LIEU = 2,
-    MON_THEO_NHOM = 3
-};
-
 class MonAn
 {
 private:
@@ -31,10 +24,6 @@ private:
     int soLuongBan;
     string donViTinh;
     string moTa;
-    int kieuMon;
-    string nguyenLieu;
-    string tuyChonPhucVu;
-    string thanhPhanNhom;
 
 public:
     MonAn();
@@ -50,11 +39,6 @@ public:
     bool laConBan() const;
     string layDonViTinh() const;
     string layMoTa() const;
-    int layKieuMon() const;
-    string layTenKieuMon() const;
-    string layNguyenLieu() const;
-    string layTuyChonPhucVu() const;
-    string layThanhPhanNhom() const;
 
     void datMaMon(string ma);
     void datTenMon(string ten);
@@ -64,14 +48,11 @@ public:
     void datSoLuongBan(int soLuong);
     void datDonViTinh(string donVi);
     void datMoTa(string mt);
-    void datKieuMon(int kieu);
-    void datNguyenLieu(string nl);
-    void datTuyChonPhucVu(string tc);
-    void datThanhPhanNhom(string tp);
 
     void hienThi() const;
-    void hienThiNgan(int stt) const; // hien thi rut gon trong danh sach
+    void hienThiNgan(int stt) const;
 
+    // Dinh dang: maMon|tenMon|loaiMon|gia|soLuongBan|trangThai|donViTinh|moTa
     string chuyenThanhDong() const;
     void docTuDong(const string &dong);
 };
@@ -85,21 +66,18 @@ private:
 
     int timViTriTheoMa(string maMon) const;
     bool kiemTraMaTonTai(string maMon) const;
-    void nhapNguyenLieu(MonAn &mon);
-    void nhapThanhPhanNhom(MonAn &mon);
 
-    // Cac ham noi bo cho luong giao dien moi
-    vector<int> locTheoNhom(const string &nhom) const; // tra ve vi tri cac mon khop nhom, "" = tat ca
-    void manHinhDanhSach(const string &nhomDangLoc);    // man hinh danh sach + thao tac inline
-    void manHinhKetQuaTimKiem(const string &nhomDangLoc); // man hinh tim kiem + thao tac inline
-    void suaMotMon(int viTri); // bang dieu chinh cho 1 mon cu the (dung lai cho ca 2 luong tren)
-    void xoaMotMon(int viTri, const string &nhomDangLoc); // xoa 1 mon, quay lai danh sach
+    vector<int> locTheoNhom(const string &nhom) const;
+    void manHinhDanhSach(const string &nhomDangLoc);
+    void manHinhKetQuaTimKiem(const string &nhomDangLoc);
+    void suaMotMon(int viTri);
+    void xoaMotMon(int viTri, const string &nhomDangLoc);
 
 public:
     QuanLyMonAn();
 
     void themMon();
-    void suaMon(); // gach chon mon roi goi suaMotMon() - dung khi vao truc tiep
+    void suaMon();
     void xoaMon();
     void timKiemTheoTen() const;
     void xemDanhSach() const;
@@ -108,8 +86,6 @@ public:
     void docFile();
     void ghiFile() const;
 
-    // Cung cap danh sach mon cho cac nghiep vu khac (ban hang, bao cao...)
-    // Du lieu chi doc, viec sua mon van phai thong qua QuanLyMonAn.
     const vector<MonAn> &layDanhSachMonAn() const;
     bool capNhatSoLuongBan(const string &maMon, int thayDoi);
 

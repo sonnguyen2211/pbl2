@@ -1,4 +1,7 @@
-DH0001|19/10/2026 12:38|nguyên hoang sơn|6|84000|B001~Bún chả Hà Nội~42000~2|KH001|dhbhdbhb|||0|
-DH0002|19/10/2026 12:50|nguyên hoang sơn|6|84000|B001~Bún chả Hà Nội~42000~2|KH001|dhbhdbhb|||0|
+DH0001|19/10/2026 12:38|nguyên hoang sơn|8|84000|B001~Bún chả Hà Nội~42000~2|KH001|dhbhdbhb|||0|
+DH0002|19/10/2026 12:50|nguyên hoang sơn|8|84000|B001~Bún chả Hà Nội~42000~2|KH001|dhbhdbhb|||0|
 DH0003|19/10/2026 12:56|Hirano Asahi|7|80000|C001~Cơm tấm sườn bì chả~40000~2|KH002|3901391039|||0|đéo
 DH0004|19/10/2026 14:07|Hirano Asahi        |7|40000|C001~Cơm tấm sườn bì chả~40000~1|KH003|234567|||0|đéo
+DH0005|23/10/2026 20:40|nguyên hoang sơn|8|35000|K002~Chả giò rế~35000~1|KH001|dhbhdbhb|||0|
+DH0006|23/10/2026 20:44|nguyên hoang sơn|1|40000|C001~Cơm tấm sườn bì chả~40000~1|KH001|dhbhdbhb|||0|
+DH0007|23/10/2026 20:46|nguyên hoang sơn|1|40000|C001~Cơm tấm sườn bì chả~40000~1|KH001|dhbhdbhb|||0|

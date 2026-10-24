@@ -22,10 +22,6 @@ MonAn::MonAn()
     soLuongBan = 0;
     donViTinh = "";
     moTa = "";
-    kieuMon = MON_THUONG;
-    nguyenLieu = "";
-    tuyChonPhucVu = "";
-    thanhPhanNhom = "";
 }
 
 MonAn::MonAn(string maMon, string tenMon, string loaiMon, double gia)
@@ -38,10 +34,6 @@ MonAn::MonAn(string maMon, string tenMon, string loaiMon, double gia)
     this->soLuongBan = 0;
     this->donViTinh = "Phần";
     this->moTa = "";
-    this->kieuMon = MON_THUONG;
-    this->nguyenLieu = "";
-    this->tuyChonPhucVu = "";
-    this->thanhPhanNhom = "";
 }
 
 string MonAn::layMaMon() const { return maMon; }
@@ -65,22 +57,6 @@ string MonAn::layTenTrangThai() const
 bool MonAn::laConBan() const { return trangThai == DANG_BAN; }
 string MonAn::layDonViTinh() const { return donViTinh; }
 string MonAn::layMoTa() const { return moTa; }
-int MonAn::layKieuMon() const { return kieuMon; }
-
-string MonAn::layTenKieuMon() const
-{
-    switch (kieuMon)
-    {
-        case MON_THUONG: return "Món thường";
-        case MON_THEO_NGUYEN_LIEU: return "Theo nguyên liệu";
-        case MON_THEO_NHOM: return "Theo nhóm";
-        default: return "Không rõ";
-    }
-}
-
-string MonAn::layNguyenLieu() const { return nguyenLieu; }
-string MonAn::layTuyChonPhucVu() const { return tuyChonPhucVu; }
-string MonAn::layThanhPhanNhom() const { return thanhPhanNhom; }
 
 void MonAn::datMaMon(string ma) { maMon = ma; }
 void MonAn::datTenMon(string ten) { tenMon = ten; }
@@ -90,10 +66,6 @@ void MonAn::datTrangThai(int trangThaiMoi) { trangThai = trangThaiMoi; }
 void MonAn::datSoLuongBan(int soLuong) { soLuongBan = soLuong; }
 void MonAn::datDonViTinh(string donVi) { donViTinh = donVi; }
 void MonAn::datMoTa(string mt) { moTa = mt; }
-void MonAn::datKieuMon(int kieu) { kieuMon = kieu; }
-void MonAn::datNguyenLieu(string nl) { nguyenLieu = nl; }
-void MonAn::datTuyChonPhucVu(string tc) { tuyChonPhucVu = tc; }
-void MonAn::datThanhPhanNhom(string tp) { thanhPhanNhom = tp; }
 
 void MonAn::hienThi() const
 {
@@ -121,14 +93,13 @@ string MonAn::chuyenThanhDong() const
     ostringstream oss;
     oss << maMon << "|" << tenMon << "|" << loaiMon << "|"
         << fixed << setprecision(0) << gia << "|" << soLuongBan << "|" << trangThai << "|"
-        << donViTinh << "|" << moTa << "|" << kieuMon << "|"
-        << nguyenLieu << "|" << tuyChonPhucVu << "|" << thanhPhanNhom;
+        << donViTinh << "|" << moTa;
     return oss.str();
 }
 
 void MonAn::docTuDong(const string &dong)
 {
-    const int SO_TRUONG = 12;
+    const int SO_TRUONG = 8;
     string cac[SO_TRUONG];
     int chiSo = 0;
     string tam = "";
@@ -159,12 +130,6 @@ void MonAn::docTuDong(const string &dong)
         trangThai = DANG_BAN;
     donViTinh = cac[6].empty() ? "Phần" : cac[6];
     moTa = cac[7];
-    kieuMon = cac[8].empty() ? MON_THUONG : atoi(cac[8].c_str());
-    if (kieuMon < MON_THUONG || kieuMon > MON_THEO_NHOM)
-        kieuMon = MON_THUONG;
-    nguyenLieu = cac[9];
-    tuyChonPhucVu = cac[10];
-    thanhPhanNhom = cac[11];
 }
 
 // ============================================================
@@ -235,171 +200,10 @@ bool QuanLyMonAn::capNhatSoLuongBan(const string &maMon, int thayDoi)
 }
 
 // ============================================================
-// CAC HAM NHAP NGUYEN LIEU / THANH PHAN / TUY CHON (giu logic cu)
+// THEM MON
 // ============================================================
-void QuanLyMonAn::nhapNguyenLieu(MonAn &mon)
-{
-    string nguyenLieu = mon.layNguyenLieu();
-    cin.ignore();
-
-    int luaChon;
-    do
-    {
-        xoaManHinh();
-        cout << "\n  ═══════════════════════════════════════════════\n";
-        cout << "  🥘 ĐỊNH LƯỢNG NGUYÊN LIỆU\n";
-        cout << "  Món: " << mon.layTenMon() << "\n";
-        cout << "  ═══════════════════════════════════════════════\n\n";
-
-        if (nguyenLieu.empty())
-        {
-            cout << "  (Chưa có nguyên liệu nào)\n";
-        }
-        else
-        {
-            stringstream ss(nguyenLieu);
-            string phan;
-            int stt = 1;
-            while (getline(ss, phan, ';'))
-            {
-                if (phan.empty()) continue;
-                stringstream ss2(phan);
-                string ten, sl, dv;
-                getline(ss2, ten, ':');
-                getline(ss2, sl, ':');
-                getline(ss2, dv, ':');
-                cout << "  " << stt << ". " << ten << ": " << sl << " " << dv << endl;
-                stt++;
-            }
-        }
-
-        cout << "\n  1. Thêm nguyên liệu";
-        cout << "\n  2. Xóa toàn bộ";
-        cout << "\n  0. Hoàn tất";
-        cout << "\n  Chọn: ";
-        cin >> luaChon;
-        cin.ignore();
-
-        if (luaChon == 1)
-        {
-            string ten, dv;
-            double sl;
-            cout << "  Tên nguyên liệu: ";
-            getline(cin, ten);
-            cout << "  Định lượng: ";
-            cin >> sl;
-            cin.ignore();
-            cout << "  Đơn vị: ";
-            getline(cin, dv);
-
-            ostringstream oss;
-            oss << ten << ":" << sl << ":" << dv;
-            if (!nguyenLieu.empty())
-                nguyenLieu += ";";
-            nguyenLieu += oss.str();
-
-            xoaManHinh();
-            cout << "\n  ✅ Đã thêm nguyên liệu!\n";
-            dungManHinh();
-        }
-        else if (luaChon == 2)
-        {
-            cout << "\n  ⚠ Xóa toàn bộ nguyên liệu? (1: Có, 0: Không): ";
-            int xn;
-            cin >> xn;
-            if (xn == 1)
-            {
-                nguyenLieu = "";
-                xoaManHinh();
-                cout << "\n  ✅ Đã xóa toàn bộ nguyên liệu!\n";
-                dungManHinh();
-            }
-        }
-    } while (luaChon != 0);
-
-    mon.datNguyenLieu(nguyenLieu);
-}
-
-void QuanLyMonAn::nhapThanhPhanNhom(MonAn &mon)
-{
-    string thanhPhan = mon.layThanhPhanNhom();
-    cin.ignore();
-
-    int luaChon;
-    do
-    {
-        xoaManHinh();
-        cout << "\n  ═══════════════════════════════════════════════\n";
-        cout << "  🍕 THÀNH PHẦN MÓN THEO NHÓM\n";
-        cout << "  Món: " << mon.layTenMon() << "\n";
-        cout << "  ═══════════════════════════════════════════════\n\n";
-
-        if (thanhPhan.empty())
-        {
-            cout << "  (Chưa có thành phần nào)\n";
-        }
-        else
-        {
-            stringstream ss(thanhPhan);
-            string phan;
-            int stt = 1;
-            while (getline(ss, phan, ';'))
-            {
-                if (phan.empty()) continue;
-                stringstream ss2(phan);
-                string ten, gia;
-                getline(ss2, ten, ':');
-                getline(ss2, gia, ':');
-                cout << "  " << stt << ". " << ten << " (+" << gia << " VND)\n";
-                stt++;
-            }
-        }
-
-        cout << "\n  1. Thêm thành phần";
-        cout << "\n  2. Xóa toàn bộ";
-        cout << "\n  0. Hoàn tất";
-        cout << "\n  Chọn: ";
-        cin >> luaChon;
-        cin.ignore();
-
-        if (luaChon == 1)
-        {
-            string ten;
-            double giaThem;
-            cout << "  Tên thành phần: ";
-            getline(cin, ten);
-            cout << "  Giá thêm: ";
-            cin >> giaThem;
-            cin.ignore();
-
-            ostringstream oss;
-            oss << ten << ":" << fixed << setprecision(0) << giaThem;
-            if (!thanhPhan.empty())
-                thanhPhan += ";";
-            thanhPhan += oss.str();
-
-            xoaManHinh();
-            cout << "\n  ✅ Đã thêm thành phần!\n";
-            dungManHinh();
-        }
-        else if (luaChon == 2)
-        {
-            thanhPhan = "";
-            xoaManHinh();
-            cout << "\n  ✅ Đã xóa toàn bộ thành phần!\n";
-            dungManHinh();
-        }
-    } while (luaChon != 0);
-
-    mon.datThanhPhanNhom(thanhPhan);
-}
-
 void QuanLyMonAn::themMon()
 {
-    // Thêm món mới mặc định dùng luồng món thông thường.
-    int kieu = 1;
-
-    // Nhap ma mon
     string ma;
     bool maHopLe;
     do
@@ -435,7 +239,6 @@ void QuanLyMonAn::themMon()
     cout << "  Tên món: ";
     getline(cin, ten);
 
-    // Chon nhom mon bang mui ten
     vector<string> dsNhomMon = {
         "1. Khai vị",
         "2. Món chính",
@@ -447,7 +250,6 @@ void QuanLyMonAn::themMon()
     string tenNhom[] = {"Khai vị", "Món chính", "Đồ uống", "Tráng miệng"};
     string loai = tenNhom[viTriNhom];
 
-    // Chon don vi tinh bang mui ten
     vector<string> dsDonVi = {
         "1. Phần",
         "2. Tô / Bát",
@@ -460,7 +262,6 @@ void QuanLyMonAn::themMon()
     string tenDonVi[] = {"Phần", "Tô/Bát", "Ly/Cốc", "Chai/Lon", "Dĩa/Đĩa"};
     string donVi = tenDonVi[viTriDonVi];
 
-    // BUOC 4: Gia, mo ta, trang thai
     xoaManHinh();
     cout << "\n  ═══════════════════════════════════════════════\n";
     cout << "  ➕ THÊM MÓN MỚI — BƯỚC 4: HOÀN TẤT\n";
@@ -505,21 +306,8 @@ void QuanLyMonAn::themMon()
     MonAn monMoi(ma, ten, loai, gia);
     monMoi.datDonViTinh(donVi);
     monMoi.datMoTa(moTa);
-    monMoi.datKieuMon(kieu);
     monMoi.datTrangThai(trangThai);
     monMoi.datSoLuongBan(soLuongBan);
-
-    if (kieu == MON_THEO_NGUYEN_LIEU)
-        nhapNguyenLieu(monMoi);
-    else if (kieu == MON_THEO_NHOM)
-        nhapThanhPhanNhom(monMoi);
-
-    xoaManHinh();
-    cout << "\n  ═══════════════════════════════════════════════\n";
-    cout << "  📋 THÔNG TIN MÓN MỚI\n";
-    cout << "  ═══════════════════════════════════════════════\n\n";
-    monMoi.hienThi();
-    cout << "  ═══════════════════════════════════════════════\n";
 
     xoaManHinh();
     cout << "\n  ═══════════════════════════════════════════════\n";
@@ -549,7 +337,7 @@ void QuanLyMonAn::themMon()
 }
 
 // ============================================================
-// SUA MOT MON - dung chung cho ca luong Danh sach va Tim kiem
+// SUA MOT MON
 // ============================================================
 void QuanLyMonAn::suaMotMon(int viTri)
 {
@@ -585,14 +373,13 @@ void QuanLyMonAn::suaMotMon(int viTri)
         int viTriChon = chonMenuMuiTen("", dsMucSua, 0);
         int muc = viTriChon;
 
-        // muc = 8 -> ung voi lua chon "0. LUU..." (vi tri cuoi cung trong vector)
         if (muc == 6)
         {
             tiepTucSua = false;
             break;
         }
 
-        int soThuTu = muc + 1; // 1..7
+        int soThuTu = muc + 1;
 
         switch (soThuTu)
         {
@@ -690,7 +477,6 @@ void QuanLyMonAn::suaMotMon(int viTri)
     dungManHinh();
 }
 
-// suaMon() ban goc: nhap ma truc tiep (dung khi khong qua man hinh danh sach)
 void QuanLyMonAn::suaMon()
 {
     xoaManHinh();
@@ -721,7 +507,7 @@ void QuanLyMonAn::suaMon()
 }
 
 // ============================================================
-// XOA MOT MON - dung chung, xoa xong quay lai danh sach
+// XOA MOT MON
 // ============================================================
 void QuanLyMonAn::xoaMotMon(int viTri, const string &nhomDangLoc)
 {
@@ -797,7 +583,7 @@ vector<int> QuanLyMonAn::locTheoNhom(const string &nhom) const
 }
 
 // ============================================================
-// MAN HINH DANH SACH (co phan trang + thao tac inline)
+// MAN HINH DANH SACH
 // ============================================================
 void QuanLyMonAn::manHinhDanhSach(const string &nhomDangLoc)
 {
@@ -823,7 +609,6 @@ void QuanLyMonAn::manHinhDanhSach(const string &nhomDangLoc)
         int start = (trangHienTai - 1) * SO_MON_TREN_TRANG;
         int end = min(start + SO_MON_TREN_TRANG, (int)dsViTri.size());
 
-        // KHAI BÁO MỚI Ở ĐÂY ĐỂ RESET CHUỖI MỖI LẦN VẼ LẠI
         ostringstream ossDanhSach;
         ossDanhSach << fixed << setprecision(0);
 
@@ -915,7 +700,7 @@ void QuanLyMonAn::manHinhDanhSach(const string &nhomDangLoc)
 }
 
 // ============================================================
-// MAN HINH KET QUA TIM KIEM (co thao tac inline + huy tim kiem)
+// MAN HINH KET QUA TIM KIEM
 // ============================================================
 void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
 {
@@ -923,19 +708,18 @@ void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
     {
         xoaManHinh();
         string tuKhoa;
-        
+
         cout << "\n  ═══════════════════════════════════════════════\n";
         cout << "  🔍 TÌM KIẾM MÓN\n";
         cout << "  ═══════════════════════════════════════════════\n";
         cout << "  Nhập tên cần tìm (hoặc nhấn Enter để hủy): ";
-        
-        // KHÔNG DÙNG cin.ignore() ở đây vì dùng menu mũi tên không bị sót bộ đệm
+
         cin.clear();
         getline(cin, tuKhoa);
 
         if (tuKhoa.empty())
         {
-            return; // Nếu bấm Enter không nhập gì thì tự động quay lại danh sách
+            return;
         }
 
         string tuKhoaThuong = tuKhoa;
@@ -958,7 +742,6 @@ void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
             return;
         }
 
-        // Gom danh sách kết quả tìm kiếm vào ostringstream
         ostringstream ossKetQua;
         ossKetQua << fixed << setprecision(0);
         ossKetQua << "\n  ════════════════════════════════════════════════════\n";
@@ -986,7 +769,7 @@ void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
 
         int vtChon = chonMenuMuiTen("⚙️ THAO TÁC KẾT QUẢ TÌM KIẾM", dsThaoTac, 0, true, ossKetQua.str());
 
-        if (vtChon == -1 || vtChon == 3) // Chọn "0. Hủy tìm kiếm" hoặc ấn ESC
+        if (vtChon == -1 || vtChon == 3)
         {
             return;
         }
@@ -1021,7 +804,7 @@ void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
         }
     }
 }
-// timKiemTheoTen() giu ban const cu, dung khi goi truc tiep tu menu (khong qua danh sach)
+
 void QuanLyMonAn::timKiemTheoTen() const
 {
     xoaManHinh();
@@ -1088,7 +871,6 @@ void QuanLyMonAn::timKiemTheoTen() const
     dungManHinh();
 }
 
-// xemDanhSach() const cu duoc giu (goi tu noi khac neu can) nhung KHONG dung trong menu moi
 void QuanLyMonAn::xemDanhSach() const
 {
     xoaManHinh();
@@ -1161,7 +943,7 @@ void QuanLyMonAn::thongKeMon() const
 }
 
 // ============================================================
-// MENU CHINH - GIAO DIEN MOI (chi con 3 chuc nang, chon bang mui ten)
+// MENU CHINH
 // ============================================================
 void QuanLyMonAn::hienThiMenu(const NguoiDung &nguoiDung)
 {
@@ -1192,7 +974,6 @@ void QuanLyMonAn::hienThiMenu(const NguoiDung &nguoiDung)
 
         if (muc.find("Xem danh sách") != string::npos)
         {
-            // Chon nhom mon can xem truoc
             vector<string> dsNhomLoc = {
                 "1. 🌐 Tất cả các nhóm",
                 "2. 🥗 Khai vị",
@@ -1204,7 +985,7 @@ void QuanLyMonAn::hienThiMenu(const NguoiDung &nguoiDung)
             int vtNhom = chonMenuMuiTen("📂 CHỌN NHÓM MÓN CẦN XEM", dsNhomLoc);
 
             if (vtNhom == (int)dsNhomLoc.size() - 1)
-                continue; // quay lai menu chinh
+                continue;
 
             string tenNhomLoc[] = {"", "Khai vị", "Món chính", "Đồ uống", "Tráng miệng"};
             manHinhDanhSach(tenNhomLoc[vtNhom]);
