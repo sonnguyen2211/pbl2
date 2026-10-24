@@ -509,7 +509,7 @@ void QuanLyMonAn::suaMon()
 // ============================================================
 // XOA MOT MON
 // ============================================================
-void QuanLyMonAn::xoaMotMon(int viTri, const string &nhomDangLoc)
+void QuanLyMonAn::xoaMotMon(int viTri)
 {
     xoaManHinh();
     cout << "\n  ═══════════════════════════════════════════════\n";
@@ -565,7 +565,7 @@ void QuanLyMonAn::xoaMon()
         return;
     }
 
-    xoaMotMon(viTri, "");
+    xoaMotMon(viTri);
 }
 
 // ============================================================
@@ -685,12 +685,12 @@ void QuanLyMonAn::manHinhDanhSach(const string &nhomDangLoc)
             if (vtMon != -1 && vtMon != (int)dsMonChon.size() - 1)
             {
                 int viTriThuc = dsViTri[start + vtMon];
-                xoaMotMon(viTriThuc, nhomDangLoc);
+                xoaMotMon(viTriThuc);
             }
         }
         else if (thaoTacDaChon.find("Tìm kiếm món") != string::npos)
         {
-            manHinhKetQuaTimKiem(nhomDangLoc);
+            manHinhKetQuaTimKiem();
         }
         else if (thaoTacDaChon.find("Quay lại") != string::npos)
         {
@@ -702,7 +702,7 @@ void QuanLyMonAn::manHinhDanhSach(const string &nhomDangLoc)
 // ============================================================
 // MAN HINH KET QUA TIM KIEM
 // ============================================================
-void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
+void QuanLyMonAn::manHinhKetQuaTimKiem()
 {
     while (true)
     {
@@ -796,7 +796,7 @@ void QuanLyMonAn::manHinhKetQuaTimKiem(const string &nhomDangLoc)
 
             int vtMon = chonMenuMuiTen("🗑️ CHỌN MÓN CẦN XÓA", dsMonChon);
             if (vtMon != -1 && vtMon != (int)dsMonChon.size() - 1)
-                xoaMotMon(viTriTimThay[vtMon], nhomDangLoc);
+                xoaMotMon(viTriTimThay[vtMon]);
         }
         else if (dsThaoTac[vtChon].find("từ khóa khác") != string::npos)
         {

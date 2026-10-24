@@ -69,9 +69,9 @@ private:
 
     vector<int> locTheoNhom(const string &nhom) const;
     void manHinhDanhSach(const string &nhomDangLoc);
-    void manHinhKetQuaTimKiem(const string &nhomDangLoc);
+    void manHinhKetQuaTimKiem();
     void suaMotMon(int viTri);
-    void xoaMotMon(int viTri, const string &nhomDangLoc);
+    void xoaMotMon(int viTri);
 
 public:
     QuanLyMonAn();
