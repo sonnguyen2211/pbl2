@@ -10,7 +10,6 @@ using namespace std;
 // ============================================================
 KhachHang::KhachHang()
 {
-    diemTichLuy = 0;
     taiKhoanBiKhoa = false;
     datVaiTro(KHACH_HANG);
 }
@@ -22,20 +21,17 @@ KhachHang::KhachHang(string maKH, string tenDangNhap, string matKhau, string hoT
     this->maKhachHang = maKH;
     this->soDienThoai = soDienThoai;
     this->diaChi = diaChi;
-    this->diemTichLuy = 0;
     this->taiKhoanBiKhoa = false;
 }
 
 string KhachHang::layMaKhachHang() const { return maKhachHang; }
 string KhachHang::laySoDienThoai() const { return soDienThoai; }
 string KhachHang::layDiaChi() const { return diaChi; }
-int KhachHang::layDiemTichLuy() const { return diemTichLuy; }
 bool KhachHang::laDangBiKhoa() const { return taiKhoanBiKhoa; }
 
 void KhachHang::datSoDienThoai(string sdt) { soDienThoai = sdt; }
 void KhachHang::datDiaChi(string dc) { diaChi = dc; }
 void KhachHang::datTaiKhoanBiKhoa(bool khoa) { taiKhoanBiKhoa = khoa; }
-void KhachHang::congDiem(int diem) { diemTichLuy += diem; }
 
 void KhachHang::doiHoTen(string hoTenMoi) { datHoTen(hoTenMoi); }
 void KhachHang::doiMatKhau(string matKhauMoi) { datMatKhau(matKhauMoi); }
@@ -49,7 +45,6 @@ string KhachHang::moTa() const
     oss << "  Họ tên        : " << layHoTen() << "\n";
     oss << "  SĐT           : " << soDienThoai << "\n";
     oss << "  Địa chỉ       : " << diaChi << "\n";
-    oss << "  Điểm tích lũy : " << diemTichLuy << "\n";
     oss << "  Tài khoản     : " << layTenDangNhap() << (taiKhoanBiKhoa ? " (đang khóa)" : " (bình thường)") << "\n";
     return oss.str();
 }
@@ -58,15 +53,14 @@ string KhachHang::chuyenThanhDong() const
 {
     ostringstream oss;
     oss << maKhachHang << "|" << layTenDangNhap() << "|" << layMatKhau() << "|"
-        << layHoTen() << "|" << soDienThoai << "|" << diaChi << "|"
-        << diemTichLuy << "|" << (taiKhoanBiKhoa ? 1 : 0);
+        << layHoTen() << "|" << soDienThoai << "|" << diaChi << "|" << (taiKhoanBiKhoa ? 1 : 0);
     return oss.str();
 }
 
 void KhachHang::docTuDong(const string &dong)
 {
     vector<string> cac = tachChuoi(dong, '|');
-    if (cac.size() < 8)
+    if (cac.size() < 7)
         throw LoiDuLieu("dòng khách hàng thiếu trường: " + dong);
 
     maKhachHang = cac[0];
@@ -75,15 +69,8 @@ void KhachHang::docTuDong(const string &dong)
     datHoTen(cac[3]);
     soDienThoai = cac[4];
     diaChi = cac[5];
-    try
-    {
-        diemTichLuy = stoi(cac[6]);
-    }
-    catch (const logic_error &)
-    {
-        throw LoiDuLieu("điểm tích lũy không phải số: " + dong);
-    }
-    taiKhoanBiKhoa = (cac[7] == "1");
+    // Đọc được cả file cũ (có cột điểm) lẫn file mới (đã bỏ cột điểm).
+    taiKhoanBiKhoa = (cac.size() >= 8 ? cac[7] : cac[6]) == "1";
     datVaiTro(KHACH_HANG);
 }
 
@@ -291,7 +278,6 @@ void QuanLyKhachHang::manHinhDanhSach(const vector<int> &dsViTri, const string &
         {
             const KhachHang &kh = kho.tatCa()[dsViTri[i]];
             nhan.push_back(kh.layMaKhachHang() + " | " + kh.layHoTen() + " | " + kh.laySoDienThoai()
-                           + " | " + to_string(kh.layDiemTichLuy()) + " điểm"
                            + (kh.laDangBiKhoa() ? " | 🔒 khóa" : ""));
         }
 
@@ -326,12 +312,10 @@ void QuanLyKhachHang::timKiem()
 void QuanLyKhachHang::thongKe() const
 {
     int biKhoa = 0;
-    long long tongDiem = 0;
     for (size_t i = 0; i < kho.tatCa().size(); i++)
     {
         if (kho.tatCa()[i].laDangBiKhoa())
             biKhoa++;
-        tongDiem += kho.tatCa()[i].layDiemTichLuy();
     }
 
     xoaManHinh();
@@ -339,7 +323,6 @@ void QuanLyKhachHang::thongKe() const
     cout << "  Tổng số khách hàng        : " << kho.tatCa().size() << "\n";
     cout << "  Tài khoản đang hoạt động  : " << kho.tatCa().size() - biKhoa << "\n";
     cout << "  Tài khoản đang bị khóa    : " << biKhoa << "\n";
-    cout << "  Tổng điểm tích lũy        : " << tongDiem << "\n";
     dungManHinh();
 }
 
@@ -389,20 +372,4 @@ void QuanLyKhachHang::hienThiMenuQuanLy()
             hienThiLoi(string("Dữ liệu không hợp lệ: ") + e.what());
         }
     }
-}
-
-// ============================================================
-// HÀM TỰ DO
-// ============================================================
-void congDiemTichLuy(const string &maKhachHang, int diem)
-{
-    KhoDuLieu<KhachHang> kho(FILE_KHACH_HANG);
-    kho.docFile();
-
-    int viTri = kho.timViTri(maKhachHang);
-    if (viTri == -1)
-        throw LoiDuLieu("không tìm thấy khách hàng " + maKhachHang);
-
-    kho.layTai(viTri).congDiem(diem);
-    kho.ghiFile();
 }

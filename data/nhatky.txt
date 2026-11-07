@@ -13,3 +13,48 @@
 2026-11-07 08:05 | DANG_NHAP | admin (QUẢN LÝ)
 2026-11-07 08:06 | DANG_NHAP_SAI | Asahi neko-chanb
 2026-11-07 08:07 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:06 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:07 | DANG_NHAP | NV002 (PHỤC VỤ)
+2026-11-07 10:07 | DON_HANG | Tạo đơn tại quầy DH0002 bởi Hirano Asahi
+2026-11-07 10:08 | DON_HANG | DH0002: ✅ Đã xác nhận, chưa thanh toán -> 💰 Đã thanh toán
+2026-11-07 10:09 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:10 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:22 | DANG_NHAP_SAI | Asahi neko-chan
+2026-11-07 10:22 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:23 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:25 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:25 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:25 | DON_HANG | Tạo đơn tại quầy DH0003 bởi Quản trị viên
+2026-11-07 10:26 | DON_HANG | DH0003: ✅ Đã xác nhận, chưa thanh toán -> 💰 Đã thanh toán
+2026-11-07 10:26 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:27 | LOI | Món "Matcha Latte" chỉ còn 1 phần trong kho. Hãy sửa số lượng trong giỏ hàng.
+2026-11-07 10:31 | DANG_NHAP_SAI | admin
+2026-11-07 10:31 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:32 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:32 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:32 | DON_HANG | Khách KH002 đặt đơn online DH0004
+2026-11-07 10:34 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:38 | DON_HANG | DH0004: ⏳ Chờ quản lý xác nhận -> ⛔ Bị từ chối
+2026-11-07 10:38 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:40 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:41 | DON_HANG | Tạo đơn tại quầy DH0005 bởi Quản trị viên
+2026-11-07 10:41 | DON_HANG | DH0005: ✅ Đã xác nhận, chưa thanh toán -> 💰 Đã thanh toán
+2026-11-07 10:42 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:42 | LOI | Món "Matcha Latte" chỉ còn 0 phần trong kho. Hãy sửa số lượng trong giỏ hàng.
+2026-11-07 10:48 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:49 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:54 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:57 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:58 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:58 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 10:58 | DANG_NHAP_SAI | Asahi neko-chan
+2026-11-07 10:58 | DANG_NHAP_SAI | Asahi neko-chan
+2026-11-07 10:58 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 10:59 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 11:00 | DANG_NHAP_SAI | Asahi neko-chan
+2026-11-07 11:00 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 11:01 | DON_HANG | Khách KH002 đặt đơn online DH0006
+2026-11-07 11:01 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 11:01 | DON_HANG | DH0006: ⏳ Chờ quản lý xác nhận -> ✅ Đã xác nhận, chưa thanh toán
+2026-11-07 11:01 | DON_HANG | DH0006: ✅ Đã xác nhận, chưa thanh toán -> 💰 Đã thanh toán
+2026-11-07 11:02 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)

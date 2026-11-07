@@ -182,6 +182,55 @@ bool QuanLyGioHang::tienHanhDatHang(const KhachHang &khachHang, int viTriGio, Qu
             continue;
         }
 
+        // Kiểm tra lại giá và tồn kho đúng lúc khách chọn xác nhận đặt hàng.
+        GioHang &gio = kho.layTai(viTriGio);
+        vector<ChiTietDonHang> chiTietCu = gio.layChiTiet();
+        vector<ChiTietDonHang> chiTietMoi = chiTietCu;
+        vector<string> monKhongTonTai;
+        vector<string> monThieuHang;
+        qlMonAn.kiemTraGioHang(chiTietMoi, monKhongTonTai, monThieuHang);
+
+        if (!monKhongTonTai.empty() || !monThieuHang.empty())
+        {
+            string canhBao = "";
+            for (size_t i = 0; i < monKhongTonTai.size(); i++)
+                canhBao += "\n  Món không còn bán: " + monKhongTonTai[i];
+            for (size_t i = 0; i < monThieuHang.size(); i++)
+                canhBao += "\n  Số lượng không đủ: " + monThieuHang[i];
+            hienThiLoi(canhBao + "\nHãy sửa giỏ hàng rồi thử đặt lại.");
+            return false;
+        }
+
+        bool giaThayDoi = false;
+        string chiTietGiaMoi = "\nGiá món trong giỏ đã thay đổi:\n";
+        for (size_t i = 0; i < chiTietMoi.size(); i++)
+        {
+            if (chiTietMoi[i].donGia != chiTietCu[i].donGia)
+            {
+                giaThayDoi = true;
+                chiTietGiaMoi += "  " + chiTietMoi[i].tenMon + ": "
+                               + dinhDangTien(chiTietCu[i].donGia) + " -> "
+                               + dinhDangTien(chiTietMoi[i].donGia) + " VND\n";
+            }
+        }
+
+        if (giaThayDoi)
+        {
+            gio.datChiTiet(chiTietMoi);
+            kho.ghiFile();
+            chiTietGiaMoi += "\nTổng tiền mới: " + dinhDangTien(gio.layTongTien()) + " VND";
+            if (!hoiXacNhan("Giá đã thay đổi. Bạn có đồng ý tiếp tục với giá mới không?", chiTietGiaMoi))
+                return false;
+
+            // Hiển thị tổng tiền mới trong bước xác nhận đặt hàng tiếp theo.
+            noiDung = "\n  📦 THÔNG TIN GIAO HÀNG\n\n";
+            noiDung += "  Người nhận : " + thongTin.tenNguoiNhan + "\n";
+            noiDung += "  SĐT        : " + thongTin.soDienThoai + "\n";
+            noiDung += "  Địa chỉ    : " + thongTin.diaChi + "\n";
+            noiDung += "  Ghi chú    : " + (thongTin.ghiChu.empty() ? string("(không có)") : thongTin.ghiChu) + "\n\n";
+            noiDung += gio.moTaChiTiet() + "\n";
+        }
+
         if (!hoiXacNhan("XÁC NHẬN ĐẶT HÀNG? Đơn sẽ chờ quản lý xác nhận.", noiDung))
             continue;
 

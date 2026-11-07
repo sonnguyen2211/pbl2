@@ -18,8 +18,6 @@ enum HanhDongDon
     DON_QUAY_LAI
 };
 
-static const int DIEM_MOI_10K = 1; // cứ 10.000 VND được 1 điểm tích lũy
-
 QuanLyDonHang::QuanLyDonHang(QuanLyMonAn &monAnDungChung)
     : kho(FILE_DON_HANG, taoDonTuDong), qlMonAn(monAnDungChung)
 {
@@ -120,28 +118,10 @@ void QuanLyDonHang::thanhToanDon(DonHang &don)
         throw;
     }
 
-    // Bước 3: đơn online thì cộng điểm tích lũy cho khách (đơn tại quầy không có khách -> bỏ qua)
-    int diem = (int)(don.layTongTien() / 10000) * DIEM_MOI_10K;
-    string maKhach = don.layMaKhachHang();
-    string thongBaoDiem = "";
-    if (!maKhach.empty() && diem > 0)
-    {
-        try
-        {
-            congDiemTichLuy(maKhach, diem);
-            thongBaoDiem = "  🎁 Đã cộng " + to_string(diem) + " điểm tích lũy cho khách " + maKhach + ".\n";
-        }
-        catch (const LoiNghiepVu &e)
-        {
-            thongBaoDiem = string("  ⚠ Chưa cộng được điểm tích lũy: ") + e.what() + "\n";
-        }
-    }
-
     xoaManHinh();
     cout << "\n  ✅ Đã xác nhận thanh toán và ghi nhận doanh thu vào sổ thu chi!\n";
     cout << "  Tiền khách đưa: " << dinhDangTien(tienKhach) << " VND\n";
     cout << "  Tiền thừa     : " << dinhDangTien(tienKhach - don.layTongTien()) << " VND\n";
-    cout << thongBaoDiem;
     dungManHinh();
 }
 

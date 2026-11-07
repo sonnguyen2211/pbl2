@@ -83,6 +83,9 @@ public:
     QuanLyMonAn();
 
     int layTonKho(const string &maMon) const; // 0 nếu không có món này
+    void kiemTraGioHang(vector<ChiTietDonHang> &cacMon,
+                        vector<string> &monKhongTonTai,
+                        vector<string> &monThieuHang) const;
 
     // CẬP NHẬT KHO theo thay đổi của 1 đơn hàng/giỏ hàng, KHÔNG BAO GIỜ làm kho bị âm:
     //   truoc = các món đã được trừ kho trước đó (đơn mới: rỗng)

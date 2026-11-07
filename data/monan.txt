@@ -1,4 +1,4 @@
-A001|Matcha Latte|Đồ uống|60000|10|1|Ly/Cốc|
+A001|Matcha Latte|Đồ uống|50000|8|1|Ly/Cốc|
 C001|Cơm tấm sườn bì chả|Món chính|40000|0|1|Phần|Cơm tấm kiểu Sài Gòn
 B001|Bún chả Hà Nội|Món chính|42000|2|1|Phần|
 M001|Mì Quảng|Món chính|38000|0|1|Phần|Mì Quảng đặc sản miền Trung

@@ -11,7 +11,7 @@ using namespace std;
 // ============================================================
 // CLASS KHACHHANG - kế thừa NguoiDung (tài khoản) và ThucTheLuuTru (lưu file)
 // Một dòng trong file:
-// maKH|tenDangNhap|matKhau|hoTen|soDienThoai|diaChi|diemTichLuy|taiKhoanBiKhoa
+// maKH|tenDangNhap|matKhau|hoTen|soDienThoai|diaChi|taiKhoanBiKhoa
 // ============================================================
 class KhachHang : public NguoiDung, public ThucTheLuuTru
 {
@@ -19,7 +19,6 @@ private:
     string maKhachHang;
     string soDienThoai;
     string diaChi;
-    int diemTichLuy;
     bool taiKhoanBiKhoa;
 
 public:
@@ -30,13 +29,11 @@ public:
     string layMaKhachHang() const;
     string laySoDienThoai() const;
     string layDiaChi() const;
-    int layDiemTichLuy() const;
     bool laDangBiKhoa() const;
 
     void datSoDienThoai(string sdt);
     void datDiaChi(string dc);
     void datTaiKhoanBiKhoa(bool khoa);
-    void congDiem(int diem); // điểm thưởng sau mỗi đơn đã thanh toán
 
     void doiHoTen(string hoTenMoi);
     void doiMatKhau(string matKhauMoi);
@@ -71,8 +68,5 @@ public:
     void hienThiThongTinTaiKhoan(const KhachHang &khachHangHienTai); // khách xem/sửa hồ sơ của mình
     void hienThiMenuQuanLy();                                    // quản lý xem và quản lý khách hàng
 };
-
-// Cộng điểm tích lũy cho 1 khách hàng và lưu file (gọi khi đơn của khách được thanh toán)
-void congDiemTichLuy(const string &maKhachHang, int diem);
 
 #endif

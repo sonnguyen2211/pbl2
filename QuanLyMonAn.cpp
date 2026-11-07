@@ -193,6 +193,31 @@ int QuanLyMonAn::layTonKho(const string &maMon) const
     return viTri == -1 ? 0 : kho.tatCa()[viTri].laySoLuongBan();
 }
 
+void QuanLyMonAn::kiemTraGioHang(vector<ChiTietDonHang> &cacMon,
+                                vector<string> &monKhongTonTai,
+                                vector<string> &monThieuHang) const
+{
+    monKhongTonTai.clear();
+    monThieuHang.clear();
+
+    for (size_t i = 0; i < cacMon.size(); i++)
+    {
+        int viTri = kho.timViTri(cacMon[i].maMon);
+        if (viTri == -1 || !kho.tatCa()[viTri].laConBan())
+        {
+            monKhongTonTai.push_back(cacMon[i].tenMon);
+            continue;
+        }
+
+        const MonAn &mon = kho.tatCa()[viTri];
+        cacMon[i].tenMon = mon.layTenMon();
+        cacMon[i].donGia = mon.layGia();
+        if (mon.laySoLuongBan() < cacMon[i].soLuong)
+            monThieuHang.push_back(mon.layTenMon() + ": cần " + to_string(cacMon[i].soLuong)
+                                   + ", còn " + to_string(mon.laySoLuongBan()));
+    }
+}
+
 void QuanLyMonAn::capNhatKho(const vector<ChiTietDonHang> &truoc, const vector<ChiTietDonHang> &sau)
 {
     // thayDoi[ma] > 0: trả về kho; < 0: lấy thêm từ kho
