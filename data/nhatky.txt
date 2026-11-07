@@ -1,0 +1,15 @@
+2026-11-03 12:26 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-04 08:28 | DANG_NHAP_SAI | Asahi neko-chan
+2026-11-04 08:28 | DANG_NHAP_SAI | Asahi neko-chan
+2026-11-04 08:28 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 07:20 | DANG_NHAP_SAI | admin
+2026-11-07 07:20 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 07:22 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 07:32 | DANG_NHAP | NV002 (PHỤC VỤ)
+2026-11-07 07:36 | DON_HANG | Tạo đơn tại quầy DH0001 bởi Hirano Asahi
+2026-11-07 08:03 | DON_HANG | DH0001: ✅ Đã xác nhận, chưa thanh toán -> ❌ Đã hủy
+2026-11-07 08:04 | DANG_NHAP_SAI | Asahi neko-chan
+2026-11-07 08:04 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
+2026-11-07 08:05 | DANG_NHAP | admin (QUẢN LÝ)
+2026-11-07 08:06 | DANG_NHAP_SAI | Asahi neko-chanb
+2026-11-07 08:07 | DANG_NHAP | Asahi neko-chan (KHÁCH HÀNG)
